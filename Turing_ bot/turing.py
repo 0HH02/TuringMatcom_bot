@@ -24,7 +24,6 @@ def enviar_doc(doc, message):
         else:
             bot.send_message(message.chat.id, "Aún no están dispoibles estos documetos")
     else:
-
         ruta += "Examenes/" + dic[message.chat.id]["asignatura"] + "/" + doc
         lista_exa = os.listdir(ruta)
         if len(lista_exa) != 0:
@@ -56,7 +55,6 @@ def buttons():
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    dic[message.chat.id] = {}
     keyboard = ReplyKeyboardMarkup(
         input_field_placeholder="Selecione la asignatura", resize_keyboard=True
     )
@@ -68,7 +66,12 @@ def start(message):
         "C#",
         "python",
     )
-    bot.reply_to(message, "bienvenidos al proyecto turing", reply_markup=keyboard)
+    if not message.chat.id in dic.keys():
+        dic[message.chat.id] = {}
+
+        bot.reply_to(message, "bienvenidos al proyecto turing", reply_markup=keyboard)
+    else:
+        bot.reply_to(message, "Selecione otra asignatura", reply_markup=keyboard)
 
 
 def AM1(message):
@@ -122,7 +125,6 @@ def text(message):
     elif message.text == "python":
         ProPython(message)
     elif message.text == "Volver":
-        del dic[message.chat.id]
         start(message)
     elif message.text == "TC1" and len(dic[message.chat.id]) != 0:
         enviar_doc("TC1", message)
@@ -141,6 +143,9 @@ def text(message):
     elif message.text == "Youtube" and len(dic[message.chat.id]) != 0:
         enviar_doc("Youtube", message)
     else:
+
+        ## aqui va el code tuyo para que responda según los documentos
+        # este que está, es el gpt normal
         response = model.generate_content(
             message.text,
             generation_config=genai.GenerationConfig(
