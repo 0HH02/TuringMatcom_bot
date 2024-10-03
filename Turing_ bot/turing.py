@@ -16,13 +16,24 @@ def enviar_doc(doc, message):
     if doc == "Libros":
         ruta += "Libros/" + dic[message.chat.id]["asignatura"]
         lista_lib = os.listdir(ruta)
-        for i in lista_lib:
-            a = open(ruta + "/" + f"{i}", "rb")
-            bot.send_chat_action(message.chat.id, "upload_document")
-            bot.send_document(message.chat.id, a)
+        if len(lista_lib) != 0:
+            for i in lista_lib:
+                a = open(ruta + "/" + f"{i}", "rb")
+                bot.send_chat_action(message.chat.id, "upload_document")
+                bot.send_document(message.chat.id, a)
+        else:
+            bot.send_message(message.chat.id, "Aún no están dispoibles estos documetos")
     else:
-        ruta += "Examenes/" + dic[message.chat.id]["asignatura"] + doc
+
+        ruta += "Examenes/" + dic[message.chat.id]["asignatura"] + "/" + doc
         lista_exa = os.listdir(ruta)
+        if len(lista_exa) != 0:
+            for i in lista_exa:
+                a = open(ruta + "/" + f"{i}", "rb")
+                bot.send_chat_action(message.chat.id, "upload_document")
+                bot.send_document(message.chat.id, a)
+        else:
+            bot.send_message(message.chat.id, "Aún no están dispoibles estos documetos")
 
 
 def buttons():
@@ -121,6 +132,8 @@ def text(message):
         enviar_doc("TC3", message)
     elif message.text == "Mundiales" and len(dic[message.chat.id]) != 0:
         enviar_doc("Mundiales", message)
+    elif message.text == "Ordinarios" and len(dic[message.chat.id]) != 0:
+        enviar_doc("Ordinarios", message)
     elif message.text == "Extras" and len(dic[message.chat.id]) != 0:
         enviar_doc("Extras", message)
     elif message.text == "Libros" and len(dic[message.chat.id]) != 0:
