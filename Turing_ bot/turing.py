@@ -8,6 +8,7 @@ genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(TOKEN)
+dic = {}
 
 
 def enviar_doc(asignatura, doc_pedido):
@@ -38,22 +39,20 @@ def start(message):
         input_field_placeholder="Selecione la asignatura", resize_keyboard=True
     )
     keyboard.add(
-        "/Álgebra",
-        "/Lógica",
-        "/AM1",
-        "/AM2",
-        "/C#",
-        "/python",
+        "Álgebra",
+        "Lógica",
+        "AM1",
+        "AM2",
+        "C#",
+        "python",
     )
     bot.reply_to(message, "bienvenidos al proyecto turing", reply_markup=keyboard)
 
 
-@bot.message_handler(commands=["AM1"])
 def AM1(message):
     bot.send_message(message.chat.id, "AM1", reply_markup=buttons())
 
 
-@bot.message_handler(commands=["AM2"])
 def AM2(message):
     bot.send_message(message.chat.id, "AM2", reply_markup=buttons())
 
@@ -85,6 +84,20 @@ def text(message):
 
     if message.text.startswith("/"):
         bot.send_message(message.chat.id, "Comando no disponible")
+    elif message.text == "AM1":
+        AM1(message)
+    elif message.text == "AM2":
+        AM2(message)
+    elif message.text == "Álgebra":
+        AL(message)
+    elif message.text == "Lógica":
+        L(message)
+    elif message.text == "C#":
+        ProCsharp(message)
+    elif message.text == "python":
+        ProPython(message)
+    elif message.text == "Volver":
+        start(message)
 
     else:
         response = model.generate_content(
