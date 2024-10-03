@@ -22,7 +22,7 @@ def start(message):
     /pro -> Programación\n
     /AM1 -> Análisis Matematico1\n
     /AM2 -> Análisis Matematico2\n
-    /Al1 -> Álgebra\n
+    /AL1 -> Álgebra\n
     /L -> Lógica
     """,
     )
@@ -40,7 +40,7 @@ def AM2(message):
 
 @bot.message_handler(commands=["AL1"])
 def AL(message):
-    pass
+    bot.send_message(message.chat.id, "hola bienenido a Álgebra")
 
 
 @bot.message_handler(commands=["L"])
@@ -58,8 +58,14 @@ def text(message):
     if message.text.startswith("/"):
         bot.send_message(message.chat.id, "Comando no disponible")
     else:
-        response = model.generate_content(["que es esto", message])
-        bot.send_message(message.chat.id, response)
+        response = model.generate_content(
+            message.text,
+            generation_config=genai.GenerationConfig(
+                max_output_tokens=1000,
+                temperature=0.1,
+            ),
+        )
+        bot.send_message(message.chat.id, response.text)
 
 
 if __name__ == "__main__":
