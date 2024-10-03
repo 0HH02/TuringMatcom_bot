@@ -1,56 +1,60 @@
 import telebot
 import os
 import google.generativeai as genai
-
+from telebot.types import ReplyKeyboardMarkup
 
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-
 model = genai.GenerativeModel(model_name="gemini-1.5-flash")
-
-
 TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    bot.reply_to(message, "bienvenidos al proyecto turing")
-    bot.send_message(
-        message.chat.id,
-        """
-    Con los siguientes comandos puede acceder a cada asignatura:\n
-    /pro -> Programación\n
-    /AM1 -> Análisis Matematico1\n
-    /AM2 -> Análisis Matematico2\n
-    /AL1 -> Álgebra\n
-    /L -> Lógica
-    """,
+    keyboard = ReplyKeyboardMarkup(
+        input_field_placeholder="Selecione la asignatura", resize_keyboard=True
     )
+    keyboard.add(
+        "/Álgebra",
+        "/Lógica",
+        "/Análisis Matemático 1",
+        "/Análisis Matematico 2",
+        "/Programación C#",
+        "/Programación Python",
+    )
+    bot.reply_to(message, "bienvenidos al proyecto turing", reply_markup=keyboard)
 
 
-@bot.message_handler(commands=["AM1"])
+@bot.message_handler(commands=["Análisis Matemático 1"])
 def AM1(message):
-    examen = open("Examenes/Mundial_Álgebra.pdf", "rb")
-    bot.send_document(message.chat.id, examen)
+    keyboard_AM1 = ReplyKeyboardMarkup(
+        input_field_placeholder="Análisis Matemático 1", resize_keyboard=True
+    )
+    keyboard_AM1.add("libros")
 
 
-@bot.message_handler(commands=["AM2"])
+@bot.message_handler(commands=["Análisis Matemático 2"])
 def AM2(message):
     pass
 
 
-@bot.message_handler(commands=["AL1"])
+@bot.message_handler(commands=["Álgebra"])
 def AL(message):
     bot.send_message(message.chat.id, "hola bienvenido a Álgebra")
 
 
-@bot.message_handler(commands=["L"])
+@bot.message_handler(commands=["Lógica"])
 def L(message):
     pass
 
 
-@bot.message_handler(commands=["Pro"])
-def Pro(message):
+@bot.message_handler(commands=["Programación C#"])
+def ProCsharp(message):
+    pass
+
+
+@bot.message_handler(commands=["Programación Python"])
+def ProPython(message):
     pass
 
 
