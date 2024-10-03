@@ -30,7 +30,8 @@ def start(message):
 
 @bot.message_handler(commands=["AM1"])
 def AM1(message):
-    pass
+    examen = open("Examenes/Mundial_Álgebra.pdf", "rb")
+    bot.send_document(message.chat.id, examen)
 
 
 @bot.message_handler(commands=["AM2"])
@@ -40,7 +41,7 @@ def AM2(message):
 
 @bot.message_handler(commands=["AL1"])
 def AL(message):
-    bot.send_message(message.chat.id, "hola bienenido a Álgebra")
+    bot.send_message(message.chat.id, "hola bienvenido a Álgebra")
 
 
 @bot.message_handler(commands=["L"])
@@ -65,6 +66,7 @@ def text(message):
                 temperature=0.1,
             ),
         )
+        bot.send_chat_action(message.chat.id, "typing")
         bot.send_message(message.chat.id, response.text)
 
 
