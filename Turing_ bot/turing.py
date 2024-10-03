@@ -11,8 +11,18 @@ bot = telebot.TeleBot(TOKEN)
 dic = {}
 
 
-def enviar_doc(asignatura, doc_pedido):
-    pass
+def enviar_doc(doc, message):
+    ruta = ""
+    if doc == "Libros":
+        ruta += "Libros/" + dic[message.chat.id]["asignatura"]
+        lista_lib = os.listdir(ruta)
+        for i in lista_lib:
+            a = open(ruta + "/" + f"{i}", "rb")
+            bot.send_chat_action(message.chat.id, "upload_document")
+            bot.send_document(message.chat.id, a)
+    else:
+        ruta += "Examenes/" + dic[message.chat.id]["asignatura"] + doc
+        lista_exa = os.listdir(ruta)
 
 
 def buttons():
@@ -35,6 +45,7 @@ def buttons():
 
 @bot.message_handler(commands=["start"])
 def start(message):
+    dic[message.chat.id] = {}
     keyboard = ReplyKeyboardMarkup(
         input_field_placeholder="Selecione la asignatura", resize_keyboard=True
     )
@@ -50,32 +61,35 @@ def start(message):
 
 
 def AM1(message):
+
+    dic[message.chat.id]["asignatura"] = "AM1"
     bot.send_message(message.chat.id, "AM1", reply_markup=buttons())
 
 
 def AM2(message):
+    dic[message.chat.id]["asignatura"] = "AM2"
     bot.send_message(message.chat.id, "AM2", reply_markup=buttons())
 
 
-@bot.message_handler(commands=["Álgebra"])
 def AL(message):
+    dic[message.chat.id]["asignatura"] = "AL"
     bot.send_message(
         message.chat.id, "hola bienvenido a Álgebra", reply_markup=buttons()
     )
 
 
-@bot.message_handler(commands=["Lógica"])
 def L(message):
+    dic[message.chat.id]["asignatura"] = "L"
     bot.send_message(message.chat.id, "Lógica", reply_markup=buttons())
 
 
-@bot.message_handler(commands=["C#"])
 def ProCsharp(message):
+    dic[message.chat.id]["asignatura"] = "C#"
     bot.send_message(message.chat.id, "Programación_C#", reply_markup=buttons())
 
 
-@bot.message_handler(commands=["python"])
 def ProPython(message):
+    dic[message.chat.id]["asignatura"] = "py"
     bot.send_message(message.chat.id, "Programación_python", reply_markup=buttons())
 
 
@@ -97,8 +111,22 @@ def text(message):
     elif message.text == "python":
         ProPython(message)
     elif message.text == "Volver":
+        del dic[message.chat.id]
         start(message)
-
+    elif message.text == "TC1" and len(dic[message.chat.id]) != 0:
+        enviar_doc("TC1", message)
+    elif message.text == "TC2" and len(dic[message.chat.id]) != 0:
+        enviar_doc("TC2", message)
+    elif message.text == "TC3" and len(dic[message.chat.id]) != 0:
+        enviar_doc("TC3", message)
+    elif message.text == "Mundiales" and len(dic[message.chat.id]) != 0:
+        enviar_doc("Mundiales", message)
+    elif message.text == "Extras" and len(dic[message.chat.id]) != 0:
+        enviar_doc("Extras", message)
+    elif message.text == "Libros" and len(dic[message.chat.id]) != 0:
+        enviar_doc("Libros", message)
+    elif message.text == "Youtube" and len(dic[message.chat.id]) != 0:
+        enviar_doc("Youtube", message)
     else:
         response = model.generate_content(
             message.text,
