@@ -1,5 +1,6 @@
 # ai.py
 import google.generativeai as genai
+import time
 
 from config import GOOGLE_API_KEY
 
@@ -9,7 +10,9 @@ model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
 def generate_embeddings(chunks, model_name="models/embedding-001"):
     embeddings = []
+    # Espera 1 segundo entre cada petición
     for chunk in chunks:
+        time.sleep(2)
         response = genai.embed_content(
             model=model_name,
             content=chunk["text"],
