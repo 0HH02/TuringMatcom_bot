@@ -79,6 +79,7 @@ def enviar_doc(bot, doc, message):
     lista = os.listdir(ruta)
     docu = lista
 
+    #### esta es la función que hay que modificar para que cuando toquen se descargue el correcto
     @bot.callback_query_handler(func=lambda call: True)
     def handle_query(call):
 
