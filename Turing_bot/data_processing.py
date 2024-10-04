@@ -3,16 +3,18 @@ import PyPDF2
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import os
-from utils import update_or_send_message, load_data, save_data
 import copy
+from tqdm import tqdm
+
+from utils import update_or_send_message, load_data, save_data
 from ai import generate_embeddings
 
 EMBEDDINGS_FILE = "embeddings_data.pkl"
 INDEX_FILE = "vector_index.pkl"
 
 
-def extract_text_from_pdf(chat_id, pdf_file):
-    update_or_send_message(chat_id, "Extrayendo texto del PDF...")
+def extract_text_from_pdf(pdf_file):
+    print("Extrayendo texto del PDF...")
     reader = PyPDF2.PdfReader(pdf_file)
     pages_text = []
     for page_number, page in enumerate(reader.pages):
@@ -25,12 +27,12 @@ def extract_text_from_pdf(chat_id, pdf_file):
                     "book_title": pdf_file.name,
                 }
             )
-    update_or_send_message(chat_id, "Texto extraído del PDF correctamente.")
+    print("Texto extraído del PDF correctamente.")
     return pages_text
 
 
 def chunk_text(chat_id, pages_text, chunk_size=500):
-    update_or_send_message(chat_id, "Dividiendo el texto en fragmentos...")
+    print("Dividiendo el texto en fragmentos...")
     chunks = []
     for page in pages_text:
         words = page["text"].split()
@@ -42,7 +44,7 @@ def chunk_text(chat_id, pages_text, chunk_size=500):
                 "book_title": page["book_title"],
             }
             chunks.append(chunk)
-    update_or_send_message(chat_id, "Texto dividido en fragmentos correctamente.")
+    print("Texto dividido en fragmentos correctamente.")
     return chunks
 
 
@@ -66,35 +68,46 @@ def search_similar_chunks_sklearn(question_embedding, index_model, chunks, top_k
     return results
 
 
+def load_existing_data():
+    if os.path.exists(EMBEDDINGS_FILE) and os.path.exists(INDEX_FILE):
+        print("Cargando datos existentes...")
+        existing_chunks = load_data(EMBEDDINGS_FILE)
+        index = load_data(INDEX_FILE)
+        return existing_chunks, index
+    return None, None
+
+
+def read_pdf_file(pdf_file_path):
+    with open(pdf_file_path, "rb") as pdf_file:
+        return extract_text_from_pdf(pdf_file)
+
+
 def procesar_libros():
     libros_folder = "Libros"
     if os.path.exists(libros_folder):
         print("Buscando archivos PDF en la carpeta 'Libros'...")
         pdf_files = [
-            os.path.join(libros_folder, f)
-            for f in os.listdir(libros_folder)
+            os.path.join(root, f)
+            for root, _, files in os.walk(libros_folder)
+            for f in files
             if f.endswith(".pdf")
         ]
         if pdf_files:
-            if os.path.exists(EMBEDDINGS_FILE) and os.path.exists(INDEX_FILE):
-                print("Cargando datos existentes...")
-                existing_chunks = load_data(EMBEDDINGS_FILE)
-                index = load_data(INDEX_FILE)
+            existing_chunks, index = load_existing_data()
+            if existing_chunks is not None and index is not None:
                 new_chunks = []
                 processed_files = set(chunk["book_title"] for chunk in existing_chunks)
                 for pdf_file_path in pdf_files:
                     if pdf_file_path not in processed_files:
                         print(f"Procesando nuevo archivo PDF: {pdf_file_path}...")
-                        with open(pdf_file_path, "rb") as pdf_file:
-                            pages_text = extract_text_from_pdf(
-                                None, pdf_file
-                            )  # Deberías pasar chat_id si es necesario
-                            new_chunks.extend(
-                                chunk_text(None, pages_text)
-                            )  # Igual aquí
+                        pages_text = read_pdf_file(pdf_file_path)
+                        new_chunks.extend(chunk_text(None, pages_text))  # Igual aquí
                 if new_chunks:
                     print("Generando embeddings para los nuevos fragmentos...")
-                    generate_embeddings(new_chunks)
+                    for chunk in tqdm(
+                        new_chunks, desc="Generando embeddings", unit="fragmento"
+                    ):
+                        generate_embeddings([chunk])
                     index, chunks = create_vector_store_sklearn(
                         existing_chunks, new_chunks=new_chunks
                     )
@@ -102,20 +115,19 @@ def procesar_libros():
                     save_data(INDEX_FILE, index)
                     return copy.deepcopy(index), chunks.copy()
                 else:
-                    chunks = existing_chunks
-                    return copy.deepcopy(index), chunks.copy()
+                    return copy.deepcopy(index), existing_chunks.copy()
             else:
                 print("Procesando todos los archivos PDF...")
                 all_pages_text = []
                 for pdf_file_path in pdf_files:
-                    with open(pdf_file_path, "rb") as pdf_file:
-                        pages_text = extract_text_from_pdf(
-                            None, pdf_file
-                        )  # Pasar chat_id si aplica
-                        all_pages_text.extend(pages_text)
+                    pages_text = read_pdf_file(pdf_file_path)
+                    all_pages_text.extend(pages_text)
                 if all_pages_text:
                     chunks = chunk_text(None, all_pages_text)
-                    generate_embeddings(chunks)
+                    for chunk in tqdm(
+                        new_chunks, desc="Generando embeddings", unit="fragmento"
+                    ):
+                        generate_embeddings([chunk])
                     index, chunks = create_vector_store_sklearn(chunks)
                     save_data(EMBEDDINGS_FILE, chunks)
                     save_data(INDEX_FILE, index)
