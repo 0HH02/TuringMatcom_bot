@@ -1,6 +1,7 @@
 # main.py
-from telebot import TeleBot
+import telebot
 from telebot.types import ReplyKeyboardMarkup
+import streamlit as st
 
 from data_processing import (
     procesar_libros,
@@ -17,7 +18,8 @@ from ai import (
     embed_question,
 )
 
-bot = TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN)
+st.title("TEST del bot")
 
 
 @bot.message_handler(commands=["start"])
@@ -161,4 +163,5 @@ def respuesta_amable(chat_id, message):
 
 
 save_index, save_chunks = procesar_libros()
+
 bot.infinity_polling()
