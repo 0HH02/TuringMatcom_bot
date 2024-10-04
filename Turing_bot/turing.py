@@ -8,6 +8,8 @@ import pickle
 from sklearn.neighbors import NearestNeighbors
 import copy
 
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+TOKEN = os.getenv("TOKEN")
 
 if not GOOGLE_API_KEY or not TOKEN:
     raise ValueError(
@@ -27,8 +29,8 @@ save_chunks = []
 
 
 # Función para extraer texto del PDF y devolverlo por página
-def extract_text_from_pdf(chat_id, pdf_file):
-    update_or_send_message(chat_id, "Extrayendo texto del PDF...")
+def extract_text_from_pdf(pdf_file):
+    # update_or_send_message(chat_id, "Extrayendo texto del PDF...")
     reader = PyPDF2.PdfReader(pdf_file)
     pages_text = []
     for page_number, page in enumerate(reader.pages):
@@ -41,13 +43,13 @@ def extract_text_from_pdf(chat_id, pdf_file):
                     "book_title": pdf_file.name,  # Agregar título del libro
                 }
             )
-    update_or_send_message(chat_id, "Texto extraído del PDF correctamente.")
+    # update_or_send_message(chat_id, "Texto extraído del PDF correctamente.")
     return pages_text
 
 
 # Dividir el texto en fragmentos para la creación de embeddings
-def chunk_text(chat_id, pages_text, chunk_size=500):
-    update_or_send_message(chat_id, "Dividiendo el texto en fragmentos...")
+def chunk_text(pages_text, chunk_size=500):
+    # update_or_send_message(chat_id, "Dividiendo el texto en fragmentos...")
     chunks = []
     for page in pages_text:
         text = page["text"]
@@ -63,15 +65,15 @@ def chunk_text(chat_id, pages_text, chunk_size=500):
                 "book_title": book_title,
             }
             chunks.append(chunk)
-    update_or_send_message(chat_id, "Texto dividido en fragmentos correctamente.")
+    # update_or_send_message(chat_id, "Texto dividido en fragmentos correctamente.")
     return chunks
 
 
 # Generar embeddings usando la API de Gemini
-def generate_embeddings(chat_id, chunks, model_name="models/embedding-001"):
-    update_or_send_message(
+def generate_embeddings(chunks, model_name="models/embedding-001"):
+    """update_or_send_message(
         chat_id, "Generando embeddings para los fragmentos de texto..."
-    )
+    )"""
     embeddings = []
     for chunk in chunks:
         response = genai.embed_content(
@@ -81,13 +83,13 @@ def generate_embeddings(chat_id, chunks, model_name="models/embedding-001"):
         )
         chunk["embedding"] = response["embedding"]
         embeddings.append(chunk["embedding"])
-    update_or_send_message(chat_id, "Embeddings generados correctamente.")
+    # update_or_send_message(chat_id, "Embeddings generados correctamente.")
     return embeddings
 
 
 # Crear la base de datos vectorial con scikit-learn
-def create_vector_store_sklearn(chat_id, existing_chunks, new_chunks=None):
-    update_or_send_message(chat_id, "Creando la base de datos vectorial...")
+def create_vector_store_sklearn(existing_chunks, new_chunks=None):
+    # update_or_send_message(chat_id, "Creando la base de datos vectorial...")
     if new_chunks:
         embeddings = np.array(
             [chunk["embedding"] for chunk in existing_chunks + new_chunks]
@@ -97,7 +99,7 @@ def create_vector_store_sklearn(chat_id, existing_chunks, new_chunks=None):
         embeddings = np.array([chunk["embedding"] for chunk in existing_chunks])
         chunks = existing_chunks
     nbrs = NearestNeighbors(n_neighbors=5, algorithm="ball_tree").fit(embeddings)
-    update_or_send_message(chat_id, "Base de datos vectorial creada correctamente.")
+    # update_or_send_message(chat_id, "Base de datos vectorial creada correctamente.")
     return nbrs, chunks
 
 
@@ -273,18 +275,22 @@ def api_answer(chat_id, question=None):
 def update_or_send_message(chat_id, text):
     if "last_message_id" in dic.get(chat_id, {}):
         try:
+            bot.send_chat_action(chat_id, "typing")
             bot.edit_message_text(
                 chat_id=chat_id, message_id=dic[chat_id]["last_message_id"], text=text
             )
         except:
+            bot.send_chat_action(chat_id, "typing")
             msg = bot.send_message(chat_id, text)
             dic[chat_id]["last_message_id"] = msg.message_id
     else:
+        bot.send_chat_action(chat_id, "typing")
         msg = bot.send_message(chat_id, text)
         dic.setdefault(chat_id, {})["last_message_id"] = msg.message_id
 
 
 def respuesta_academica(chat_id, message):
+    bot.send_chat_action(chat_id, "typing")
     bot.send_message(
         chat_id,
         api_answer(chat_id, message),
@@ -296,6 +302,7 @@ def respuesta_amable(chat_id, message, generation_model="gemini-1.5-flash"):
     gen_model = genai.GenerativeModel(model_name=generation_model)
     instruction = f"Eres un tutor virtual creado por estudiantes de MATCOM para ayudar a otros estudiantes en su estudio independientemente. Siempre das respuestas objetivas. Tú objetivo principal es que el estudiante entienda los ejercicios en primer lugar de forma intuitiva y luego algorítmica. Tienes acceso a los libros de las asignaturas y respondes según la documentación. Puedes hablar de cualquier cosa pero te especializas en matemáticas y progración ya que tienes como base de conocimientos todos los libros que utilizan los estudiantes en la carrera. Pregunta: {message}"
     response = gen_model.generate_content({"role": "user", "parts": [instruction]})
+    bot.send_chat_action(chat_id, "typing")
     bot.send_message(
         chat_id,
         response.text,
