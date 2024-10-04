@@ -2,6 +2,7 @@
 from telebot.types import ReplyKeyboardMarkup
 import pickle
 import re
+import os
 
 dic = {}
 
@@ -44,7 +45,7 @@ def buttons():
         "Ordinarios",
         "Libros",
         "Youtube",
-        "Volver",
+        "🔙",
     )
     return botones
 
