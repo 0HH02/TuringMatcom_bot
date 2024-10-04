@@ -10,7 +10,14 @@ from data_processing import (
     INDEX_FILE,
 )
 from config import TOKEN
-from utils import buttons, enviar_doc, dic, update_or_send_message, escape_markdown
+from utils import (
+    buttons,
+    enviar_doc,
+    dic,
+    update_or_send_message,
+    escape_markdown,
+    buscar,
+)
 from ai import (
     generate_answer,
     evaluar_trivialidad,
@@ -87,40 +94,37 @@ def ProPython(message):
     bot.send_message(message.chat.id, "Programación_python", reply_markup=buttons())
 
 
+_reservadas = {
+    "AM1": AM1,
+    "AM2": AM2,
+    "Álgebra": AL,
+    "Lógica": L,
+    "C#": ProCsharp,
+    "python": ProPython,
+    "🔙": start,
+}
+_examen = [
+    "TC1",
+    "TC2",
+    "TC3",
+    "Mundiales",
+    "Ordinarios",
+    "Extras",
+    "Libros",
+    "Youtube",
+]
+
+
 @bot.message_handler(content_types=["text"])
 def text_handler(message):
     if message.text.startswith("/"):
         bot.send_message(message.chat.id, "Comando no disponible")
-    elif message.text == "AM1":
-        AM1(message)
-    elif message.text == "AM2":
-        AM2(message)
-    elif message.text == "Álgebra":
-        AL(message)
-    elif message.text == "Lógica":
-        L(message)
-    elif message.text == "C#":
-        ProCsharp(message)
-    elif message.text == "python":
-        ProPython(message)
-    elif message.text == "🔙":
-        start(message)
-    elif message.text == "TC1" and len(dic[message.chat.id]) != 0:
-        enviar_doc(bot, "TC1", message)
-    elif message.text == "TC2" and len(dic[message.chat.id]) != 0:
-        enviar_doc(bot, "TC2", message)
-    elif message.text == "TC3" and len(dic[message.chat.id]) != 0:
-        enviar_doc(bot, "TC3", message)
-    elif message.text == "Mundiales" and len(dic[message.chat.id]) != 0:
-        enviar_doc(bot, "Mundiales", message)
-    elif message.text == "Ordinarios" and len(dic[message.chat.id]) != 0:
-        enviar_doc(bot, "Ordinarios", message)
-    elif message.text == "Extras" and len(dic[message.chat.id]) != 0:
-        enviar_doc(bot, "Extras", message)
-    elif message.text == "Libros" and len(dic[message.chat.id]) != 0:
-        enviar_doc(bot, "Libros", message)
-    elif message.text == "Youtube" and len(dic[message.chat.id]) != 0:
-        enviar_doc(bot, "Youtube", message)
+    if message.text in _reservadas.keys():
+        _reservadas[message.text](message)
+
+    elif message.text in _examen and len(dic[message.chat.id]) != 0:
+        indice = buscar(_examen, message.text)
+        enviar_doc(bot, _examen[indice], message)
     else:
         es_trivial = evaluar_trivialidad(message.text)
         bot.send_chat_action(message.chat.id, "typing")

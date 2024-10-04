@@ -7,6 +7,12 @@ import os
 dic = {}
 
 
+def buscar(lista, target):
+    for i, j in enumerate(lista):
+        if j == target:
+            return i
+
+
 def save_data(file_path, data):
     with open(file_path, "wb") as f:
         pickle.dump(data, f)
