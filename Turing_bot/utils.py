@@ -1,16 +1,20 @@
 # utils.py
 from telebot.types import ReplyKeyboardMarkup
+from telebot.types import InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup
 import pickle
 import re
 import os
 
 dic = {}
+global docu
 
 
 def buscar(lista, target):
     for i, j in enumerate(lista):
         if j == target:
             return i
+    return 0
 
 
 def save_data(file_path, data):
@@ -56,42 +60,65 @@ def buttons():
     return botones
 
 
+def crear_botones(lista):
+    m = InlineKeyboardMarkup()
+    for i in lista:
+        if i != ".DS_Store":
+            boton = InlineKeyboardButton(str(i), callback_data=str(i))
+            m.add(boton)
+    return m
+
+
 def enviar_doc(bot, doc, message):
-    ruta = ""
-    if doc == "Libros":
-        ruta += "Libros/" + dic[message.chat.id]["asignatura"]
-        lista_lib = os.listdir(ruta)
-        if len(lista_lib) != 0:
-            for i in lista_lib:
-                with open(ruta + "/" + f"{i}", "rb") as a:
-                    try:
-                        bot.send_chat_action(message.chat.id, "upload_document")
-                        bot.send_document(message.chat.id, a)
-                    except Exception as e:
-                        bot.send_message(
-                            message.chat.id, f"Error al enviar el documento: {str(e)}"
-                        )
-        else:
-            bot.send_message(
-                message.chat.id, "Aún no están disponibles estos documentos"
-            )
+    ruta = (
+        "Libros/" + dic[message.chat.id]["asignatura"]
+        if doc == "Libros"
+        else "Examenes/" + dic[message.chat.id]["asignatura"] + "/" + doc
+    )
+
+    lista = os.listdir(ruta)
+    docu = lista
+
+    @bot.callback_query_handler(func=lambda call: True)
+    def handle_query(call):
+
+        indice = buscar(docu, call.data)
+        a = open(
+            (
+                (
+                    "Libros/"
+                    + dic[message.chat.id]["asignatura"]
+                    + "/"
+                    + str(docu[indice])
+                )
+                if doc == "Libros"
+                else (
+                    "Examenes/"
+                    + dic[message.chat.id]["asignatura"]
+                    + "/"
+                    + doc
+                    + "/"
+                    + str(docu[indice])
+                )
+            ),
+            "rb",
+        )
+        bot.send_chat_action(call.message.chat.id, "upload_document")
+        bot.send_document(call.message.chat.id, a)
+
+    if len(lista) != 0:
+        documentos = crear_botones(lista)
+        bot.send_message(
+            message.chat.id,
+            (
+                "Estos son los libros de la asignatura"
+                if doc != "Examenes"
+                else "Estos son algunos Examenes de la asignatura"
+            ),
+            reply_markup=documentos,
+        )
     else:
-        ruta += "Examenes/" + dic[message.chat.id]["asignatura"] + "/" + doc
-        lista_exa = os.listdir(ruta)
-        if len(lista_exa) != 0:
-            for i in lista_exa:
-                with open(ruta + "/" + f"{i}", "rb") as a:
-                    try:
-                        bot.send_chat_action(message.chat.id, "upload_document")
-                        bot.send_document(message.chat.id, a)
-                    except Exception as e:
-                        bot.send_message(
-                            message.chat.id, f"Error al enviar el documento: {str(e)}"
-                        )
-        else:
-            bot.send_message(
-                message.chat.id, "Aún no están disponibles estos documentos"
-            )
+        bot.send_message(message.chat.id, "No contamos con los libros solicitados")
 
 
 def escape_markdown(text):
