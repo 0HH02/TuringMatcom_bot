@@ -1,6 +1,7 @@
 # utils.py
 from telebot.types import ReplyKeyboardMarkup
 import pickle
+import re
 
 dic = {}
 
@@ -48,19 +49,62 @@ def buttons():
     return botones
 
 
-def enviar_doc(bot, chat_id, doc, asignatura):
-    try:
-        if doc == "Libros":
-            ruta = f"Libros/{asignatura}"
+def enviar_doc(bot, doc, message):
+    ruta = ""
+    if doc == "Libros":
+        ruta += "Libros/" + dic[message.chat.id]["asignatura"]
+        lista_lib = os.listdir(ruta)
+        if len(lista_lib) != 0:
+            for i in lista_lib:
+                with open(ruta + "/" + f"{i}", "rb") as a:
+                    try:
+                        bot.send_chat_action(message.chat.id, "upload_document")
+                        bot.send_document(message.chat.id, a)
+                    except Exception as e:
+                        bot.send_message(
+                            message.chat.id, f"Error al enviar el documento: {str(e)}"
+                        )
         else:
-            ruta = f"Examenes/{asignatura}/{doc}"
-        lista_archivos = os.listdir(ruta)
-        if lista_archivos:
-            for archivo in lista_archivos:
-                with open(os.path.join(ruta, archivo), "rb") as a:
-                    bot.send_chat_action(chat_id, "upload_document")
-                    bot.send_document(chat_id, a)
+            bot.send_message(
+                message.chat.id, "Aún no están disponibles estos documentos"
+            )
+    else:
+        ruta += "Examenes/" + dic[message.chat.id]["asignatura"] + "/" + doc
+        lista_exa = os.listdir(ruta)
+        if len(lista_exa) != 0:
+            for i in lista_exa:
+                with open(ruta + "/" + f"{i}", "rb") as a:
+                    try:
+                        bot.send_chat_action(message.chat.id, "upload_document")
+                        bot.send_document(message.chat.id, a)
+                    except Exception as e:
+                        bot.send_message(
+                            message.chat.id, f"Error al enviar el documento: {str(e)}"
+                        )
         else:
-            bot.send_message(chat_id, "Aún no están disponibles estos documentos")
-    except Exception as e:
-        bot.send_message(chat_id, f"Error al enviar el documento: {str(e)}")
+            bot.send_message(
+                message.chat.id, "Aún no están disponibles estos documentos"
+            )
+
+
+def escape_markdown(text):
+    """
+    Escapa todos los caracteres especiales de Markdown en el texto de entrada.
+
+    Telegram Markdown permite escapar caracteres con el símbolo de barra invertida (\).
+    Esta función escapa todos los caracteres que se deben escapar según la especificación de Markdown.
+
+    Caracteres especiales en Markdown:
+    - `_`, `*`, `[`, `]`, `(`, `)`, `~`, `>`, `#`, `+`, `-`, `=`, `|`, `{`, `}`, `.`, `!`
+
+    Args:
+        text (str): El texto de entrada que debe ser escapado.
+
+    Returns:
+        str: El texto con todos los caracteres especiales de Markdown escapados.
+    """
+    # Lista de caracteres especiales que deben ser escapados
+    special_characters = r"([_*\[\]()~`>#+\-=|{}.!])"
+
+    # Escapar todos los caracteres especiales con una barra invertida (\)
+    return re.sub(special_characters, r"\\\1", text)

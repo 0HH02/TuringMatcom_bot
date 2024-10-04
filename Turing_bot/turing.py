@@ -1,3 +1,6 @@
+# Configurar API keys desde variables de entorno
+GOOGLE_API_KEY = "AIzaSyCpQ7M42a7fsZtqCoeYrZCJDVOn-9GexP0"
+TOKEN = "7872510777:AAEYeOUR3Jf1-OAqhx1pUjgGSVk3ylD2Sys"
 import telebot
 import os
 import google.generativeai as genai
