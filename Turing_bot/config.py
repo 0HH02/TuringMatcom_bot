@@ -1,8 +1,8 @@
 # config.py
 import os
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyCpQ7M42a7fsZtqCoeYrZCJDVOn-9GexP0")
-TOKEN = os.getenv("TOKEN", "7872510777:AAEYeOUR3Jf1-OAqhx1pUjgGSVk3ylD2Sys")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+TOKEN = os.getenv("TOKEN")
 
 if not GOOGLE_API_KEY or not TOKEN:
     raise ValueError(

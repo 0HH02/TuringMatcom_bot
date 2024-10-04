@@ -1,0 +1,6 @@
+streamlit
+numpy 
+pandas
+pyTelegramBotAPI
+scikit-learn
+google-generativeai

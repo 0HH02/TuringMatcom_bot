@@ -26,12 +26,22 @@ def generate_answer(question, context_chunks, generation_model="gemini-1.5-flash
     prompt = (
         f"Eres un profesor de la Universidad de La Habana con conocimientos en Matemática, Ciencia de la Computación y Ciencia de Datos. "
         f"Siempre respondes usando primero una información objetiva y luego intentas explicarlo de manera intuitiva poniendo ejemplos prácticos. "
-        f"Tienes en cuenta que estás escribiendo por telegram, por lo que usas el formato Markdown para dar formato a tu respuesta. "
+        f"Tienes en cuenta que estás escribiendo por telegram, por lo que usas el formato Markdown para dar formato a tu respuesta. Ejemplo: "
+        f"""**Negrita:**
+            *Cursiva*:
+            **Negrita y cursiva:**
+            ~~Tachado~~:
+            `[Enlace](URL)`
+            `` `código de línea` ``
+            Código de bloque:  
+            ```
+            código de bloque
+            ``` """
         f"Utilizando el siguiente contexto, responde la pregunta e indica de qué libro se obtuvo cada fragmento.\n\n"
         f"Contexto:\n{context_text}\n\n"
         f"Pages:\n{get_pages_from_chunks(context_chunks)}\n\n"
         f"Book references:\n{book_references}\n\n"
-        f"Pregunta: {question}\nRespuesta:"
+        f"Pregunta: {question}"
     )
     gen_model = genai.GenerativeModel(model_name=generation_model)
     response = gen_model.generate_content({"role": "user", "parts": [prompt]})
@@ -54,7 +64,7 @@ def evaluar_trivialidad(question, generation_model="gemini-1.5-flash"):
 
 def respuesta_amable_api(message, generation_model="gemini-1.5-flash"):
     gen_model = genai.GenerativeModel(model_name=generation_model)
-    instruction = f"Eres un tutor virtual creado por estudiantes de MATCOM para ayudar a otros estudiantes en su estudio independientemente. Siempre das respuestas objetivas. Tú objetivo principal es que el estudiante entienda los ejercicios en primer lugar de forma intuitiva y luego algorítmica. Tienes acceso a los libros de las asignaturas y respondes según la documentación. Puedes hablar de cualquier cosa pero te especializas en matemáticas y progración ya que tienes como base de conocimientos todos los libros que utilizan los estudiantes en la carrera. Pregunta: {message}"
+    instruction = f"Eres un tutor virtual creado por estudiantes de MATCOM para ayudar a otros estudiantes en su estudio independientemente. Siempre das respuestas objetivas. Tú objetivo principal es que el estudiante entienda los ejercicios en primer lugar de forma intuitiva y luego algorítmica. Tienes acceso a los libros de las asignaturas y respondes según la documentación. Puedes hablar de cualquier cosa pero te especializas en matemáticas y progración ya que tienes como base de conocimientos todos los libros que utilizan los estudiantes en la carrera. Fuiste creado por Carlos Mario Chang Jardínez de Ciencias de la Computación y Alberto Enrique Marichal Fonseca de Ciencias de Datos en 2 días en octubre del 2024. Pregunta: {message}"
     response = gen_model.generate_content({"role": "user", "parts": [instruction]})
     return response.text
 
@@ -62,3 +72,12 @@ def respuesta_amable_api(message, generation_model="gemini-1.5-flash"):
 def get_pages_from_chunks(chunks):
     pages = set(chunk["page_number"] for chunk in chunks)
     return sorted(pages)
+
+
+def embed_question(question, model_name="models/embedding-001"):
+    response = genai.embed_content(
+        model=model_name,
+        content=question,
+        task_type="RETRIEVAL_QUERY",
+    )
+    return response["embedding"]
