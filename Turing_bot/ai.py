@@ -10,7 +10,6 @@ model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
 def generate_embeddings(chunks, model_name="models/embedding-001"):
     embeddings = []
-    # Espera 1 segundo entre cada petición
     for chunk in chunks:
         response = genai.embed_content(
             model=model_name,
