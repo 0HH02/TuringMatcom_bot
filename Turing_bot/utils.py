@@ -1,5 +1,5 @@
 # utils.py
-from telebot.types import ReplyKeyboardMarkup
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from telebot.types import InlineKeyboardButton
 from telebot.types import InlineKeyboardMarkup
 import pickle
@@ -46,16 +46,17 @@ def buttons():
     botones = ReplyKeyboardMarkup(
         input_field_placeholder="Seleccione la asignatura", resize_keyboard=True
     )
+
     botones.add(
-        "TC1",
-        "TC2",
-        "TC3",
-        "Mundiales",
-        "Extras",
-        "Ordinarios",
-        "Libros",
-        "Youtube",
-        "🔙",
+        KeyboardButton("TC1"),
+        KeyboardButton("TC2"),
+        KeyboardButton("TC3"),
+        KeyboardButton("Mundiales"),
+        KeyboardButton("Extras"),
+        KeyboardButton("Ordinarios"),
+        KeyboardButton("Libros"),
+        KeyboardButton("Youtube"),
+        KeyboardButton("🔙"),
     )
     return botones
 
