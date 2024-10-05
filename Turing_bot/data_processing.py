@@ -31,7 +31,7 @@ def extract_text_from_pdf(pdf_file):
     return pages_text
 
 
-def chunk_text(pages_text, chunk_size=500):
+def chunk_text(pages_text, chunk_size=400):
     print("Dividiendo el texto en fragmentos...")
     chunks = []
     for page in pages_text:
