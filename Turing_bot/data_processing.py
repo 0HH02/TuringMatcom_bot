@@ -31,7 +31,7 @@ def extract_text_from_pdf(pdf_file):
     return pages_text
 
 
-def chunk_text(chat_id, pages_text, chunk_size=500):
+def chunk_text(pages_text, chunk_size=500):
     print("Dividiendo el texto en fragmentos...")
     chunks = []
     for page in pages_text:
@@ -101,7 +101,7 @@ def procesar_libros():
                     if pdf_file_path not in processed_files:
                         print(f"Procesando nuevo archivo PDF: {pdf_file_path}...")
                         pages_text = read_pdf_file(pdf_file_path)
-                        new_chunks.extend(chunk_text(None, pages_text))  # Igual aquí
+                        new_chunks.extend(chunk_text(pages_text))  # Igual aquí
                 if new_chunks:
                     print("Generando embeddings para los nuevos fragmentos...")
                     for chunk in tqdm(
@@ -123,9 +123,9 @@ def procesar_libros():
                     pages_text = read_pdf_file(pdf_file_path)
                     all_pages_text.extend(pages_text)
                 if all_pages_text:
-                    chunks = chunk_text(None, all_pages_text)
+                    chunks = chunk_text(all_pages_text)
                     for chunk in tqdm(
-                        new_chunks, desc="Generando embeddings", unit="fragmento"
+                        chunks, desc="Generando embeddings", unit="fragmento"
                     ):
                         generate_embeddings([chunk])
                     index, chunks = create_vector_store_sklearn(chunks)

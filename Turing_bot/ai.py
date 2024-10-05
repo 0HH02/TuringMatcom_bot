@@ -12,7 +12,6 @@ def generate_embeddings(chunks, model_name="models/embedding-001"):
     embeddings = []
     # Espera 1 segundo entre cada petición
     for chunk in chunks:
-        time.sleep(2)
         response = genai.embed_content(
             model=model_name,
             content=chunk["text"],
