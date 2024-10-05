@@ -136,26 +136,34 @@ def text_handler(message):
 
 def respuesta_academica(chat_id, question):
     if question:
-        update_or_send_message(bot, chat_id, "Buscando respuesta a la pregunta...")
-        question_embedding = embed_question(question)
-        update_or_send_message(bot, chat_id, "Buscando fragmentos similares...")
-        bot.send_chat_action(chat_id, "typing")
-        similar_chunks = search_similar_chunks_sklearn(
-            question_embedding=question_embedding,
-            index_model=save_index,
-            chunks=save_chunks,
-        )
-        if not similar_chunks:
-            update_or_send_message(
-                bot, chat_id, "No se encontraron resultados relevantes."
+        try:
+            update_or_send_message(bot, chat_id, "Buscando respuesta a la pregunta...")
+            question_embedding = embed_question(question)
+            update_or_send_message(bot, chat_id, "Buscando fragmentos similares...")
+            bot.send_chat_action(chat_id, "typing")
+            similar_chunks = search_similar_chunks_sklearn(
+                question_embedding=question_embedding,
+                index_model=save_index,
+                chunks=save_chunks,
             )
-        else:
-            answer, pages, book_references = generate_answer(question, similar_chunks)
-            response = f"Respuesta: {answer} \nPáginas relacionadas: {pages} \nReferencias de libros: {book_references}"
-            try:
+            if not similar_chunks:
+                update_or_send_message(
+                    bot, chat_id, "No se encontraron resultados relevantes."
+                )
+            else:
+                answer, pages, book_references = generate_answer(
+                    question, similar_chunks
+                )
+                # Extraer los nombres de los libros y separarlos por puntos en markdown
+                book_names = [
+                    os.path.basename(ref).replace("_", " ").replace(".pdf", "")
+                    for ref in book_references.split(", ")
+                ]
+                book_references_formatted = ". ".join(book_names)
+                response = f"{answer} \nPáginas relacionadas: {pages} \n\nReferencias de libros: {book_references_formatted}"
                 bot.send_message(chat_id, response, parse_mode="Markdown")
-            except:
-                bot.send_message(chat_id, response)
+        except Exception as e:
+            bot.send_message(chat_id, f"Se produjo un error: {str(e)}")
 
 
 def respuesta_amable(chat_id, message):
