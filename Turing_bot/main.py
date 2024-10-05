@@ -157,12 +157,17 @@ def respuesta_academica(chat_id, question):
                 )
                 # Extraer los nombres de los libros y separarlos por puntos en markdown
                 book_names = [
-                    os.path.basename(ref).replace("_", " ").replace(".pdf", "")
+                    "\n- " + os.path.basename(ref).replace("_", " ").replace(".pdf", "")
                     for ref in book_references.split(", ")
                 ]
                 book_references_formatted = ". ".join(book_names)
                 response = f"{answer} \nPáginas relacionadas: {pages} \n\nReferencias de libros: {book_references_formatted}"
-                bot.send_message(chat_id, response, parse_mode="Markdown")
+                try:
+                    bot.send_message(chat_id, response, parse_mode="Markdown")
+                except Exception as e:
+                    print(book_references_formatted)
+                    bot.send_message(chat_id, response)
+
         except Exception as e:
             bot.send_message(chat_id, f"Se produjo un error: {str(e)}")
 
