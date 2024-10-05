@@ -5,3 +5,4 @@ pyTelegramBotAPI
 scikit-learn
 google-generativeai
 pyPDF2
+tqdm
