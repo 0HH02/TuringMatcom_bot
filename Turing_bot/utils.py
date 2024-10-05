@@ -79,10 +79,9 @@ def enviar_doc(bot, doc, message):
     lista = os.listdir(ruta)
     docu = lista
 
-    #### esta es la función que hay que modificar para que cuando toquen se descargue el correcto
+    """#### esta es la función que hay que modificar para que cuando toquen se descargue el correcto
     @bot.callback_query_handler(func=lambda call: True)
     def handle_query(call):
-
         indice = buscar(docu, call.data)
         a = open(
             (
@@ -105,21 +104,20 @@ def enviar_doc(bot, doc, message):
             "rb",
         )
         bot.send_chat_action(call.message.chat.id, "upload_document")
-        bot.send_document(call.message.chat.id, a)
+        bot.send_document(call.message.chat.id, a)"""
 
     if len(lista) != 0:
         documentos = crear_botones(lista)
         bot.send_message(
             message.chat.id,
-            (
-                "Estos son los libros de la asignatura"
-                if doc != "Examenes"
-                else "Estos son algunos Examenes de la asignatura"
-            ),
+            f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
             reply_markup=documentos,
         )
     else:
-        bot.send_message(message.chat.id, "No contamos con los libros solicitados")
+        bot.send_message(
+            message.chat.id,
+            f"No contamos con los {doc} solicitados para {dic[message.chat.id]['asignatura']}",
+        )
 
 
 def escape_markdown(text):
