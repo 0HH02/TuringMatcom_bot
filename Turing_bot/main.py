@@ -1,7 +1,6 @@
 # main.py
 import telebot
 from telebot.types import ReplyKeyboardMarkup
-import streamlit as st
 import os
 
 from data_processing import (
@@ -27,7 +26,6 @@ from ai import (
 )
 
 bot = telebot.TeleBot(TOKEN)
-st.title("TEST del bot")
 
 
 @bot.message_handler(commands=["start"])
