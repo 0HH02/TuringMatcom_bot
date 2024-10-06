@@ -117,7 +117,6 @@ def enviar_doc_mat(bot, doc, message):
 def crear_botones_yt(yt):
     m = InlineKeyboardMarkup()
     for i in yt:
-        print(i)
         a = i[:-1]
         boton = InlineKeyboardButton(str(a), callback_data=str(a))
         m.add(boton)
@@ -126,15 +125,10 @@ def crear_botones_yt(yt):
 
 def enviar_doc(bot, doc, message):
     if doc == "Youtube":
-        ruta = (
-            "Libros/" + dic[message.chat.id]["asignatura"]
-            if doc == "Libros"
-            else "Examenes/" + dic[message.chat.id]["asignatura"] + "/" + doc
-        )
-
+        ruta = os.path.join("Examenes", dic[message.chat.id]["asignatura"], doc)
         lista = os.listdir(ruta)
         if len(lista) != 0:
-            yt = open(ruta + "/yt.txt")
+            yt = open(os.path.join(ruta, "yt.txt"))
             b = crear_botones_yt(yt)
             bot.send_chat_action(message.chat.id, "typing")
             bot.send_message(
@@ -152,9 +146,9 @@ def enviar_doc(bot, doc, message):
     else:
 
         ruta = (
-            "Libros/" + dic[message.chat.id]["asignatura"]
+            os.path.join("Libros", dic[message.chat.id]["asignatura"])
             if doc == "Libros"
-            else "Examenes/" + dic[message.chat.id]["asignatura"] + "/" + doc
+            else os.path.join("Examenes", dic[message.chat.id]["asignatura"], doc)
         )
 
         lista = os.listdir(ruta)
@@ -188,20 +182,14 @@ def enviar_doc(bot, doc, message):
             bot.send_document(call.message.chat.id, a)"""
 
         if len(lista) != 0:
-            if lista[0] != ".DS_Store":
-                documentos = crear_botones(lista)
-                bot.send_chat_action(message.chat.id, "typing")
-                bot.send_message(
-                    message.chat.id,
-                    f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
-                    reply_markup=documentos,
-                )
-            else:
-                bot.send_chat_action(message.chat.id, "typing")
-                bot.send_message(
-                    message.chat.id,
-                    f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
-                )
+            documentos = crear_botones(lista)
+            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_message(
+                message.chat.id,
+                f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
+                reply_markup=documentos,
+            )
+
         else:
             bot.send_chat_action(message.chat.id, "typing")
             bot.send_message(
