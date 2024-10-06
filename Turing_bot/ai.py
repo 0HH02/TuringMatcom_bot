@@ -1,4 +1,5 @@
 # ai.py
+from typing import LiteralString
 import google.generativeai as genai
 import time
 
@@ -24,24 +25,19 @@ def generate_embeddings(chunks, model_name="models/embedding-001"):
 def generate_answer(question, context_chunks, generation_model="gemini-1.5-flash"):
     context_text = "\n".join([chunk["text"] for chunk in context_chunks])
     book_references = ", ".join(set([chunk["book_title"] for chunk in context_chunks]))
+    book_names = [
+        "\n- " + os.path.basename(ref).replace("_", " ").replace(".pdf", "")
+        for ref in book_references.split(", ")
+    ]
+    book_references_formatted = "\n\n".join(book_names)
     prompt = (
         f"Eres un profesor de la Universidad de La Habana con conocimientos en Matemática, Ciencia de la Computación y Ciencia de Datos. "
         f"Siempre respondes usando primero una información objetiva y luego intentas explicarlo de manera intuitiva poniendo ejemplos prácticos. "
-        f"Tienes en cuenta que estás escribiendo por telegram, por lo que usas el formato Markdown para dar formato a tu respuesta. Ejemplo: "
-        f"""**Negrita:**
-            *Cursiva*:
-            **Negrita y cursiva:**
-            ~~Tachado~~:
-            `[Enlace](URL)`
-            `` `código de línea` ``
-            Código de bloque:  
-            ```
-            código de bloque
-            ``` """
+        f"Tienes en cuenta que estás escribiendo por telegram, por lo que usas el formato Markdown para dar formato a tu respuesta. "
         f"Utilizando el siguiente contexto, responde la pregunta e indica de qué libro se obtuvo cada fragmento.\n\n"
         f"Contexto:\n{context_text}\n\n"
         f"Pages:\n{get_pages_from_chunks(context_chunks)}\n\n"
-        f"Book references:\n{book_references}\n\n"
+        f"Book references:\n{book_references_formatted}\n\n"
         f"Pregunta: {question}"
     )
     gen_model = genai.GenerativeModel(model_name=generation_model)
