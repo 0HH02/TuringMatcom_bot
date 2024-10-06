@@ -1,5 +1,4 @@
 # ai.py
-from typing import LiteralString
 import google.generativeai as genai
 import time
 
