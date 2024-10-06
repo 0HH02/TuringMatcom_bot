@@ -29,7 +29,7 @@ from ai import (
     embed_question,
 )
 
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN, parse_mode="Markdown")
 USER_DATA_FILE = "user_data.pkl"
 
 # Cargar los datos de los usuarios al iniciar el bot
