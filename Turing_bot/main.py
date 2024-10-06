@@ -12,6 +12,7 @@ from data_processing import (
 from config import TOKEN
 from utils import (
     buttons,
+    buttons_mat,
     enviar_doc,
     dic,
     update_or_send_message,
@@ -25,7 +26,7 @@ from ai import (
     embed_question,
 )
 
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN, parse_mode="markdown")
 
 
 @bot.message_handler(commands=["start"])
@@ -33,14 +34,7 @@ def start(message):
     keyboard = ReplyKeyboardMarkup(
         input_field_placeholder="Seleccione la asignatura", resize_keyboard=True
     )
-    keyboard.add(
-        "Álgebra",
-        "Lógica",
-        "AM1",
-        "AM2",
-        "C#",
-        "python",
-    )
+    keyboard.add("Álgebra", "Lógica", "AM1", "AM2", "C#", "python", "Matemática")
     if message.chat.id not in dic:
         dic[message.chat.id] = {}
         bot.reply_to(
@@ -93,6 +87,11 @@ def ProPython(message):
     bot.send_message(message.chat.id, "Programación_python", reply_markup=buttons())
 
 
+def Mate(message):
+    dic[message.chat.id]["asignatura"] = "Mat"
+    bot.send_message(message.chat.id, "matemática", reply_markup=buttons_mat())
+
+
 _reservadas = {
     "AM1": AM1,
     "AM2": AM2,
@@ -100,6 +99,7 @@ _reservadas = {
     "Lógica": L,
     "C#": ProCsharp,
     "python": ProPython,
+    "Matemática": Mate,
     "🔙": start,
 }
 _examen = [
@@ -112,6 +112,7 @@ _examen = [
     "Libros",
     "Youtube",
 ]
+_mates = ["IAM", "IA", "GA", "IM", "FVR", "AL", "Libros", "Youtube", "🔙"]
 
 
 @bot.message_handler(content_types=["text"])
@@ -124,6 +125,13 @@ def text_handler(message):
     elif message.text in _examen and len(dic[message.chat.id]) != 0:
         indice = buscar(_examen, message.text)
         enviar_doc(bot, _examen[indice], message)
+    elif (
+        message.text in _mates
+        and not (message.text in _examen)
+        and len(dic[message.chat.id]) != 0
+    ):
+        indice = buscar(_mates, message.text)
+        enviar_doc_mat(bot, _mates[indice], message)
     else:
         es_trivial = evaluar_trivialidad(message.text)
         bot.send_chat_action(message.chat.id, "typing")
