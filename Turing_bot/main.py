@@ -123,7 +123,7 @@ _examen = [
     "Libros",
     "Youtube",
 ]
-_mates = ["IAM", "IA", "GA", "IM", "FVR", "AL", "Libros", "Youtube", "🔙"]
+_mates = ["IAM", "IA", "GA", "IM", "FVR", "AL"]
 
 
 @bot.message_handler(content_types=["text"])

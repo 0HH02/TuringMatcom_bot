@@ -64,7 +64,6 @@ def buttons_mat():
     botones = ReplyKeyboardMarkup(
         input_field_placeholder="Seleccione la asignatura", resize_keyboard=True
     )
-
     botones.add(
         KeyboardButton("IAM"),
         KeyboardButton("IA"),
