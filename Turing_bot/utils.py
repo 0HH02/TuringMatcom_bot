@@ -182,13 +182,20 @@ def enviar_doc(bot, doc, message):
             bot.send_document(call.message.chat.id, a)"""
 
         if len(lista) != 0:
-            documentos = crear_botones(lista)
-            bot.send_chat_action(message.chat.id, "typing")
-            bot.send_message(
-                message.chat.id,
-                f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
-                reply_markup=documentos,
-            )
+            if len(lista) == 1 and lista[0] == ".DS_Store":
+                bot.send_chat_action(message.chat.id, "typing")
+                bot.send_message(
+                    message.chat.id,
+                    f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
+                )
+            else:
+                documentos = crear_botones(lista)
+                bot.send_chat_action(message.chat.id, "typing")
+                bot.send_message(
+                    message.chat.id,
+                    f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
+                    reply_markup=documentos,
+                )
 
         else:
             bot.send_chat_action(message.chat.id, "typing")
