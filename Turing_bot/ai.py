@@ -1,6 +1,7 @@
 # ai.py
 import google.generativeai as genai
 import time
+import os
 
 from config import GOOGLE_API_KEY
 
