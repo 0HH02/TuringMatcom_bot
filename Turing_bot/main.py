@@ -71,18 +71,36 @@ Usa los botones de abajo para buscar bibliografía sobre asignaturas específica
         )
 
 
+@bot.message_handler(commands=["turing"])
+def handle_turing(message):
+    # Si el comando se usa en un grupo
+    if message.chat.type in ["group", "supergroup"]:
+        # Extraer el texto después del comando /turing
+        # El formato esperado es /turing <mensaje>
+        if len(message.text.split()) > 1:
+            # Eliminar el comando y dejar solo el mensaje como argumento
+            pregunta = message.text.split(" ", 1)[1]
+
+            # Evaluar la pregunta para decidir el tipo de respuesta
+            es_trivial = evaluar_trivialidad(pregunta)
+            bot.send_chat_action(message.chat.id, "typing")
+            if "True" in es_trivial:
+                respuesta_amable(message.chat.id, pregunta)
+            else:
+                respuesta_academica(message.chat.id, pregunta)
+        else:
+            bot.reply_to(
+                message,
+                "Por favor, introduce una pregunta después del comando /turing. Ejemplo: /turing ¿Qué es un punto de acumulación?",
+            )
+    else:
+        bot.reply_to(message, "Este comando solo se puede usar en grupos.")
+
+
 @bot.message_handler(content_types=["text"])
 def text_handler(message):
     # Verificar si el bot está en un grupo
-    if message.chat.type in ["group", "supergroup"]:
-        # Responder solo de forma amable o académica, sin mostrar botones
-        es_trivial = evaluar_trivialidad(message.text)
-        bot.send_chat_action(message.chat.id, "typing")
-        if "True" in es_trivial:
-            respuesta_amable(message.chat.id, message.text)
-        else:
-            respuesta_academica(message.chat.id, message.text)
-    else:
+    if message.chat.type == "private":
         # Comportamiento estándar en chat privado
         if message.text.startswith("/"):
             bot.send_message(message.chat.id, "Comando no disponible")
