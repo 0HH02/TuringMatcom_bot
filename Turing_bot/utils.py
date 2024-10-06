@@ -46,7 +46,6 @@ def buttons():
     botones = ReplyKeyboardMarkup(
         input_field_placeholder="Seleccione la asignatura", resize_keyboard=True
     )
-
     botones.add(
         KeyboardButton("TC1"),
         KeyboardButton("TC2"),
@@ -54,6 +53,25 @@ def buttons():
         KeyboardButton("Mundiales"),
         KeyboardButton("Extras"),
         KeyboardButton("Ordinarios"),
+        KeyboardButton("Libros"),
+        KeyboardButton("Youtube"),
+        KeyboardButton("🔙"),
+    )
+    return botones
+
+
+def buttons_mat():
+    botones = ReplyKeyboardMarkup(
+        input_field_placeholder="Seleccione la asignatura", resize_keyboard=True
+    )
+
+    botones.add(
+        KeyboardButton("IAM"),
+        KeyboardButton("IA"),
+        KeyboardButton("GA"),
+        KeyboardButton("IM"),
+        KeyboardButton("FVR"),
+        KeyboardButton("AL"),
         KeyboardButton("Libros"),
         KeyboardButton("Youtube"),
         KeyboardButton("🔙"),
@@ -70,7 +88,22 @@ def crear_botones(lista):
     return m
 
 
+def enviar_doc_mat(bot, doc, message):
+    ruta = "Mat/" + doc
+    lista_mat = os.listdir(ruta)
+    if len(lista_mat) != 0:
+        botones_mat = crear_botones(lista_mat)
+        bot.send_message(
+            message.chat.id,
+            f"Conferencias y clases prácticas",
+            reply_markup=botones_mat,
+        )
+    else:
+        bot.send_message(message.chat.id, "No hay documentos disponibles")
+
+
 def enviar_doc(bot, doc, message):
+
     ruta = (
         "Libros/" + dic[message.chat.id]["asignatura"]
         if doc == "Libros"
