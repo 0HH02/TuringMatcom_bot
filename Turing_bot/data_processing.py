@@ -31,19 +31,51 @@ def extract_text_from_pdf(pdf_file):
     return pages_text
 
 
-def chunk_text(pages_text, chunk_size=400):
+def chunk_text(pages_text, max_chars=2500, max_bytes=10000):
     print("Dividiendo el texto en fragmentos...")
     chunks = []
+
     for page in pages_text:
-        words = page["text"].split()
-        for i in range(0, len(words), chunk_size):
-            chunk_text = " ".join(words[i : i + chunk_size])
-            chunk = {
-                "page_number": page["page_number"],
-                "text": chunk_text,
-                "book_title": page["book_title"],
-            }
-            chunks.append(chunk)
+        page_text = page["text"]
+        page_number = page["page_number"]
+        book_title = page["book_title"]
+
+        # Dividimos el texto de la página en palabras
+        words = page_text.split()
+        chunk_text = ""
+
+        # Vamos agregando palabras hasta alcanzar el límite de caracteres y bytes
+        for word in words:
+            # Si agregar la siguiente palabra excede el límite de caracteres o de bytes, guardamos el fragmento y comenzamos uno nuevo
+            if (
+                len(chunk_text) + len(word) + 1 > max_chars
+                or len(chunk_text.encode("utf-8")) + len(word.encode("utf-8")) + 1
+                > max_bytes
+            ):
+                chunks.append(
+                    {
+                        "page_number": page_number,
+                        "text": chunk_text,
+                        "book_title": book_title,
+                    }
+                )
+                chunk_text = word  # Comenzamos un nuevo fragmento con la palabra actual
+            else:
+                if chunk_text:
+                    chunk_text += " " + word
+                else:
+                    chunk_text = word
+
+        # Agregar cualquier texto restante como un fragmento final
+        if chunk_text:
+            chunks.append(
+                {
+                    "page_number": page_number,
+                    "text": chunk_text,
+                    "book_title": book_title,
+                }
+            )
+
     print("Texto dividido en fragmentos correctamente.")
     return chunks
 
