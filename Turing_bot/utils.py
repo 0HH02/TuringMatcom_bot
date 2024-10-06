@@ -89,7 +89,17 @@ def crear_botones(lista):
 
 
 def enviar_doc_mat(bot, doc, message):
-    pass
+    ruta = "Mat/" + doc
+    lista_mat = os.listdir(ruta)
+    if len(lista_mat) != 0:
+        botones_mat = crear_botones(lista_mat)
+        bot.send_message(
+            message.chat.id,
+            f"Conferencias y clases prácticas",
+            reply_markup=botones_mat,
+        )
+    else:
+        bot.send_message(message.chat.id, "No hay documentos disponibles")
 
 
 def enviar_doc(bot, doc, message):
