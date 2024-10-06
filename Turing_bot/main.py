@@ -128,6 +128,66 @@ def text_handler(message):
         save_data(USER_DATA_FILE, dic)
 
 
+def AM1(message):
+    dic[message.chat.id]["asignatura"] = "AM1"
+    bot.send_message(message.chat.id, "AM1", reply_markup=buttons())
+
+
+def AM2(message):
+    dic[message.chat.id]["asignatura"] = "AM2"
+    bot.send_message(message.chat.id, "AM2", reply_markup=buttons())
+
+
+def AL(message):
+    dic[message.chat.id]["asignatura"] = "AL"
+    bot.send_message(
+        message.chat.id, "hola bienvenido a Álgebra", reply_markup=buttons()
+    )
+
+
+def L(message):
+    dic[message.chat.id]["asignatura"] = "L"
+    bot.send_message(message.chat.id, "Lógica", reply_markup=buttons())
+
+
+def ProCsharp(message):
+    dic[message.chat.id]["asignatura"] = "C#"
+    bot.send_message(message.chat.id, "Programación_C#", reply_markup=buttons())
+
+
+def ProPython(message):
+    dic[message.chat.id]["asignatura"] = "py"
+    bot.send_message(message.chat.id, "Programación_python", reply_markup=buttons())
+
+
+def Mate(message):
+    dic[message.chat.id]["asignatura"] = "Mat"
+    bot.send_message(message.chat.id, "matemática", reply_markup=buttons_mat())
+
+
+_reservadas = {
+    "AM1": AM1,
+    "AM2": AM2,
+    "Álgebra": AL,
+    "Lógica": L,
+    "C#": ProCsharp,
+    "python": ProPython,
+    "Matemática": Mate,
+    "🔙": start,
+}
+_examen = [
+    "TC1",
+    "TC2",
+    "TC3",
+    "Mundiales",
+    "Ordinarios",
+    "Extras",
+    "Libros",
+    "Youtube",
+]
+_mates = ["IAM", "IA", "GA", "IM", "FVR", "AL"]
+
+
 def respuesta_academica(chat_id, question):
     if question:
         try:
@@ -176,6 +236,8 @@ def respuesta_amable(chat_id, message):
         parse_mode="Markdown",
     )
 
+
+save_index, save_chunks = procesar_libros()
 
 # Iniciar el bot
 bot.infinity_polling()
