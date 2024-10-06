@@ -237,7 +237,7 @@ def respuesta_amable(chat_id, message):
     )
 
 
-save_index, save_chunks = procesar_libros()
+# save_index, save_chunks = procesar_libros()
 
 # Iniciar el bot
 bot.infinity_polling()
