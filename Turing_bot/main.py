@@ -28,7 +28,7 @@ from ai import (
     embed_question,
 )
 
-bot = telebot.TeleBot(TOKEN, parse_mode="Markdown")
+bot = telebot.TeleBot(TOKEN)
 USER_DATA_FILE = "user_data.pkl"
 
 # Cargar los datos de los usuarios al iniciar el bot
@@ -71,7 +71,7 @@ Usa los botones de abajo para buscar bibliografía sobre asignaturas específica
         )
 
 
-@bot.message_handler(commands=["turing"])
+@bot.message_handler(commands=["turing", "Turing"])
 def handle_turing(message):
     # Si el comando se usa en un grupo
     if message.chat.type in ["group", "supergroup"]:

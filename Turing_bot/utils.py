@@ -91,66 +91,118 @@ def enviar_doc_mat(bot, doc, message):
     ruta = "Mat/" + doc
     lista_mat = os.listdir(ruta)
     if len(lista_mat) != 0:
-        botones_mat = crear_botones(lista_mat)
+        if lista_mat[0] != "..DS_Store":
+            botones_mat = crear_botones(lista_mat)
+            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_message(
+                message.chat.id,
+                f"Conferencias y clases prácticas",
+                reply_markup=botones_mat,
+            )
+        else:
+            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_message(
+                message.chat.id,
+                f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
+            )
+
+    else:
+        bot.send_chat_action(message.chat.id, "typing")
         bot.send_message(
             message.chat.id,
-            f"Conferencias y clases prácticas",
-            reply_markup=botones_mat,
+            f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
         )
-    else:
-        bot.send_message(message.chat.id, "No hay documentos disponibles")
+
+
+def crear_botones_yt(yt):
+    m = InlineKeyboardMarkup()
+    for i in yt:
+        a = i[:-1]
+        boton = InlineKeyboardButton(str(a), callback_data=str(a))
+        m.add(boton)
+    return m
 
 
 def enviar_doc(bot, doc, message):
+    if doc == "Youtube":
+        ruta = os.path.join("Examenes", dic[message.chat.id]["asignatura"], doc)
+        lista = os.listdir(ruta)
+        if len(lista) != 0:
+            yt = open(os.path.join(ruta, "yt.txt"))
+            b = crear_botones_yt(yt)
+            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_message(
+                message.chat.id,
+                f"Estos son los videos {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
+                reply_markup=b,
+            )
+        else:
+            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_message(
+                message.chat.id,
+                f"No contamos con videos de {doc} para {dic[message.chat.id]['asignatura']}",
+            )
 
-    ruta = (
-        "Libros/" + dic[message.chat.id]["asignatura"]
-        if doc == "Libros"
-        else "Examenes/" + dic[message.chat.id]["asignatura"] + "/" + doc
-    )
-
-    lista = os.listdir(ruta)
-    docu = lista
-
-    """#### esta es la función que hay que modificar para que cuando toquen se descargue el correcto
-    @bot.callback_query_handler(func=lambda call: True)
-    def handle_query(call):
-        indice = buscar(docu, call.data)
-        a = open(
-            (
-                (
-                    "Libros/"
-                    + dic[message.chat.id]["asignatura"]
-                    + "/"
-                    + str(docu[indice])
-                )
-                if doc == "Libros"
-                else (
-                    "Examenes/"
-                    + dic[message.chat.id]["asignatura"]
-                    + "/"
-                    + doc
-                    + "/"
-                    + str(docu[indice])
-                )
-            ),
-            "rb",
-        )
-        bot.send_chat_action(call.message.chat.id, "upload_document")
-        bot.send_document(call.message.chat.id, a)"""
-
-    if len(lista) != 0:
-        documentos = crear_botones(lista)
-        bot.send_message(
-            message.chat.id,
-            f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
-            reply_markup=documentos,
-        )
     else:
-        bot.send_message(
-            message.chat.id,
-            f"No contamos con los {doc} solicitados para {dic[message.chat.id]['asignatura']}",
+
+        ruta = (
+            os.path.join("Libros", dic[message.chat.id]["asignatura"])
+            if doc == "Libros"
+            else os.path.join("Examenes", dic[message.chat.id]["asignatura"], doc)
         )
+
+        lista = os.listdir(ruta)
+        docu = lista
+
+        """#### esta es la función que hay que modificar para que cuando toquen se descargue el correcto
+        @bot.callback_query_handler(func=lambda call: True)
+        def handle_query(call):
+            indice = buscar(docu, call.data)
+            a = open(
+                (
+                    (
+                        "Libros/"
+                        + dic[message.chat.id]["asignatura"]
+                        + "/"
+                        + str(docu[indice])
+                    )
+                    if doc == "Libros"
+                    else (
+                        "Examenes/"
+                        + dic[message.chat.id]["asignatura"]
+                        + "/"
+                        + doc
+                        + "/"
+                        + str(docu[indice])
+                    )
+                ),
+                "rb",
+            )
+            bot.send_chat_action(call.message.chat.id, "upload_document")
+            bot.send_document(call.message.chat.id, a)"""
+
+        if len(lista) != 0:
+            if len(lista) == 1 and lista[0] == ".DS_Store":
+                bot.send_chat_action(message.chat.id, "typing")
+                bot.send_message(
+                    message.chat.id,
+                    f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
+                )
+            else:
+                documentos = crear_botones(lista)
+                bot.send_chat_action(message.chat.id, "typing")
+                bot.send_message(
+                    message.chat.id,
+                    f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
+                    reply_markup=documentos,
+                )
+
+        else:
+            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_message(
+                message.chat.id,
+                f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
+            )
 
 
 def escape_markdown(text):
