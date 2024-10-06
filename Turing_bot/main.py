@@ -144,12 +144,12 @@ def text_handler(message):
         enviar_doc_mat(bot, _mates[indice], message)
     else:
         print("Procesando texto...")
-        es_trivial = evaluar_trivialidad(message.text)
-        bot.send_chat_action(message.chat.id, "typing")
-        if "True" in es_trivial:
-            respuesta_amable(message.chat.id, message.text)
-        else:
-            respuesta_academica(message.chat.id, message.text)
+        # es_trivial = evaluar_trivialidad(message.text)
+        # bot.send_chat_action(message.chat.id, "typing")
+        # if "True" in es_trivial:
+        #     respuesta_amable(message.chat.id, message.text)
+        # else:
+        #     respuesta_academica(message.chat.id, message.text)
     # Guardar los datos de los usuarios cada vez que se maneja un mensaje de texto
     save_data(USER_DATA_FILE, dic)
 
@@ -203,6 +203,6 @@ def respuesta_amable(chat_id, message):
     )
 
 
-save_index, save_chunks = procesar_libros()
+# save_index, save_chunks = procesar_libros()
 
 bot.infinity_polling()
