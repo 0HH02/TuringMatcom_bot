@@ -7,14 +7,14 @@ import re
 import os
 
 dic = {}
-global docu
+docu = []
 
 
 def buscar(lista, target):
     for i, j in enumerate(lista):
         if j == target:
             return i
-    return 0
+    return -1
 
 
 def save_data(file_path, data):
@@ -91,7 +91,7 @@ def enviar_doc_mat(bot, doc, message):
     ruta = "Mat/" + doc
     lista_mat = os.listdir(ruta)
     if len(lista_mat) != 0:
-        if lista_mat[0] != "..DS_Store":
+        if lista_mat[0] != ".DS_Store":
             botones_mat = crear_botones(lista_mat)
             bot.send_chat_action(message.chat.id, "typing")
             bot.send_message(
@@ -123,6 +123,43 @@ def crear_botones_yt(yt):
     return m
 
 
+def quitar_ds(lista):
+    a = []
+    if ".DS_Store" in lista:
+        for i in lista:
+            if i != ".DS_Store":
+                a.append(i)
+        return a
+    return lista
+
+
+def buscar_en_archivo(ruta, data):
+    for dirpath, dirnames, filenames in os.walk(ruta):
+        if data in filenames:
+            return os.path.join(dirpath, data)
+    return False
+
+
+def download(bot, data, message):
+    ruta = buscar_en_archivo("Examenes", data)
+    if ruta:
+        abrir = open(ruta, "rb")
+        bot.send_chat_action(message.chat.id, "upload_document")
+        bot.send_document(message.chat.id, abrir)
+    else:
+        ruta = buscar_en_archivo("Libros", data)
+        if ruta:
+            abrir = open(ruta, "rb")
+            bot.send_chat_action(message.chat.id, "upload_document")
+            bot.send_document(message.chat.id, abrir)
+        else:
+            ruta = buscar_en_archivo("Mat", data)
+            if ruta:
+                abrir = open(ruta, "rb")
+                bot.send_chat_action(message.chat.id, "upload_document")
+                bot.send_document(message.chat.id, abrir)
+
+
 def enviar_doc(bot, doc, message):
     if doc == "Youtube":
         ruta = os.path.join("Examenes", dic[message.chat.id]["asignatura"], doc)
@@ -152,34 +189,11 @@ def enviar_doc(bot, doc, message):
         )
 
         lista = os.listdir(ruta)
-        docu = lista
+        docu = quitar_ds(lista)
 
-        """#### esta es la función que hay que modificar para que cuando toquen se descargue el correcto
         @bot.callback_query_handler(func=lambda call: True)
         def handle_query(call):
-            indice = buscar(docu, call.data)
-            a = open(
-                (
-                    (
-                        "Libros/"
-                        + dic[message.chat.id]["asignatura"]
-                        + "/"
-                        + str(docu[indice])
-                    )
-                    if doc == "Libros"
-                    else (
-                        "Examenes/"
-                        + dic[message.chat.id]["asignatura"]
-                        + "/"
-                        + doc
-                        + "/"
-                        + str(docu[indice])
-                    )
-                ),
-                "rb",
-            )
-            bot.send_chat_action(call.message.chat.id, "upload_document")
-            bot.send_document(call.message.chat.id, a)"""
+            download(bot, call.data, message)
 
         if len(lista) != 0:
             if len(lista) == 1 and lista[0] == ".DS_Store":
