@@ -97,37 +97,6 @@ def handle_turing(message):
         bot.reply_to(message, "Este comando solo se puede usar en grupos.")
 
 
-@bot.message_handler(content_types=["text"])
-def text_handler(message):
-    # Verificar si el bot está en un grupo
-    if message.chat.type == "private":
-        # Comportamiento estándar en chat privado
-        if message.text.startswith("/"):
-            bot.send_message(message.chat.id, "Comando no disponible")
-        elif message.text in _reservadas.keys():
-            _reservadas[message.text](message)
-        elif message.text in _examen and len(dic[message.chat.id]) != 0:
-            indice = buscar(_examen, message.text)
-            enviar_doc(bot, _examen[indice], message)
-        elif (
-            message.text in _mates
-            and not (message.text in _examen)
-            and len(dic[message.chat.id]) != 0
-        ):
-            indice = buscar(_mates, message.text)
-            enviar_doc_mat(bot, _mates[indice], message)
-        else:
-            es_trivial = evaluar_trivialidad(message.text)
-            bot.send_chat_action(message.chat.id, "typing")
-            if "True" in es_trivial:
-                respuesta_amable(message.chat.id, message.text)
-            else:
-                respuesta_academica(message.chat.id, message.text)
-
-        # Guardar los datos de los usuarios cada vez que se maneja un mensaje de texto
-        save_data(USER_DATA_FILE, dic)
-
-
 def AM1(message):
     dic[message.chat.id]["asignatura"] = "AM1"
     bot.send_message(message.chat.id, "AM1", reply_markup=buttons())
@@ -186,6 +155,37 @@ _examen = [
     "Youtube",
 ]
 _mates = ["IAM", "IA", "GA", "IM", "FVR", "AL"]
+
+
+@bot.message_handler(content_types=["text"])
+def text_handler(message):
+    # Verificar si el bot está en un grupo
+    if message.chat.type == "private":
+        # Comportamiento estándar en chat privado
+        if message.text.startswith("/"):
+            bot.send_message(message.chat.id, "Comando no disponible")
+        elif message.text in _reservadas.keys():
+            _reservadas[message.text](message)
+        elif message.text in _examen and len(dic[message.chat.id]) != 0:
+            indice = buscar(_examen, message.text)
+            enviar_doc(bot, _examen[indice], message)
+        elif (
+            message.text in _mates
+            and not (message.text in _examen)
+            and len(dic[message.chat.id]) != 0
+        ):
+            indice = buscar(_mates, message.text)
+            enviar_doc_mat(bot, _mates[indice], message)
+        else:
+            es_trivial = evaluar_trivialidad(message.text)
+            bot.send_chat_action(message.chat.id, "typing")
+            if "True" in es_trivial:
+                respuesta_amable(message.chat.id, message.text)
+            else:
+                respuesta_academica(message.chat.id, message.text)
+
+        # Guardar los datos de los usuarios cada vez que se maneja un mensaje de texto
+        save_data(USER_DATA_FILE, dic)
 
 
 def respuesta_academica(chat_id, question):
