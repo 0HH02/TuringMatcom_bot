@@ -144,6 +144,7 @@ def text_handler(message):
         indice = buscar(_mates, message.text)
         enviar_doc_mat(bot, _mates[indice], message)
     else:
+        print("Procesando texto...")
         es_trivial = evaluar_trivialidad(message.text)
         bot.send_chat_action(message.chat.id, "typing")
         if "True" in es_trivial:
