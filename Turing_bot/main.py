@@ -132,7 +132,6 @@ def text_handler(message):
         bot.send_message(message.chat.id, "Comando no disponible")
     if message.text in _reservadas.keys():
         _reservadas[message.text](message)
-
     elif message.text in _examen and len(dic[message.chat.id]) != 0:
         indice = buscar(_examen, message.text)
         enviar_doc(bot, _examen[indice], message)
