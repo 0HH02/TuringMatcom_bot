@@ -145,8 +145,10 @@ def procesar_libros():
                     )
                     save_data(EMBEDDINGS_FILE, chunks)
                     save_data(INDEX_FILE, index)
+                    print("Procesamiento completado.")
                     return copy.deepcopy(index), chunks.copy()
                 else:
+                    print("Procesamiento completado.")
                     return copy.deepcopy(index), existing_chunks.copy()
             else:
                 print("Procesando todos los archivos PDF...")
@@ -163,6 +165,7 @@ def procesar_libros():
                     index, chunks = create_vector_store_sklearn(chunks)
                     save_data(EMBEDDINGS_FILE, chunks)
                     save_data(INDEX_FILE, index)
+                    print("Procesamiento completado.")
                     return copy.deepcopy(index), chunks.copy()
         else:
             print("No se encontraron archivos PDF en la carpeta 'Libros'.")

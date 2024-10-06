@@ -19,6 +19,8 @@ from utils import (
     update_or_send_message,
     escape_markdown,
     buscar,
+    load_data,
+    save_data,
 )
 from ai import (
     generate_answer,
@@ -27,7 +29,12 @@ from ai import (
     embed_question,
 )
 
-bot = telebot.TeleBot(TOKEN, parse_mode="markdown")
+bot = telebot.TeleBot(TOKEN)
+USER_DATA_FILE = "user_data.pkl"
+
+# Cargar los datos de los usuarios al iniciar el bot
+if os.path.exists(USER_DATA_FILE):
+    dic.update(load_data(USER_DATA_FILE))
 
 
 @bot.message_handler(commands=["start"])
@@ -54,6 +61,9 @@ Usa los botones de abajo para buscar bibliografía sobre asignaturas específica
             "Seleccione otra asignatura o hágame una pregunta",
             reply_markup=keyboard,
         )
+
+    # Guardar los datos de los usuarios cada vez que se ejecuta el comando /start
+    save_data(USER_DATA_FILE, dic)
 
 
 def AM1(message):
@@ -140,6 +150,8 @@ def text_handler(message):
             respuesta_amable(message.chat.id, message.text)
         else:
             respuesta_academica(message.chat.id, message.text)
+    # Guardar los datos de los usuarios cada vez que se maneja un mensaje de texto
+    save_data(USER_DATA_FILE, dic)
 
 
 def respuesta_academica(chat_id, question):
@@ -167,8 +179,12 @@ def respuesta_academica(chat_id, question):
                     "\n- " + os.path.basename(ref).replace("_", " ").replace(".pdf", "")
                     for ref in book_references.split(", ")
                 ]
-                book_references_formatted = ". ".join(book_names)
-                response = f"{answer} \nPáginas relacionadas: {pages} \n\nReferencias de libros: {book_references_formatted}"
+                book_references_formatted = "\n\n".join(book_names)
+                response = (
+                    f"{answer}\n\n"
+                    f"**Páginas relacionadas:** {pages}\n\n"
+                    f"**Referencias de libros:** {book_references_formatted}"
+                )
                 try:
                     bot.send_message(chat_id, response, parse_mode="Markdown")
                 except Exception as e:
