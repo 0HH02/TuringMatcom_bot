@@ -1,4 +1,3 @@
-# main.py
 import telebot
 from telebot.types import ReplyKeyboardMarkup
 import os
@@ -39,119 +38,76 @@ if os.path.exists(USER_DATA_FILE):
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    keyboard = ReplyKeyboardMarkup(
-        input_field_placeholder="Seleccione la asignatura", resize_keyboard=True
-    )
-    keyboard.add("Álgebra", "Lógica", "AM1", "AM2", "C#", "python", "Matemática")
-    if message.chat.id not in dic:
-        dic[message.chat.id] = {}
-        bot.reply_to(
-            message,
-            """🎉Bienvenido al Proyecto Turing🎉 
+    if message.chat.type == "private":
+        # Crear el teclado solo para el chat privado
+        keyboard = ReplyKeyboardMarkup(
+            input_field_placeholder="Seleccione la asignatura", resize_keyboard=True
+        )
+        keyboard.add("Álgebra", "Lógica", "AM1", "AM2", "C#", "python", "Matemática")
+        if message.chat.id not in dic:
+            dic[message.chat.id] = {}
+            bot.reply_to(
+                message,
+                """🎉Bienvenido al Proyecto Turing🎉 
 🤖 Soy tu nuevo tutor virtual, creado por los propios estudiantes y una muestra de lo que podrás hacer en poco tiempo. Mi misión es ayudarte a sobrevivir (y triunfar) en las asignaturas de MATCOM. Puedes preguntarme sobre los temas que te están volviendo loco, y yo buscaré la información en los libros de texto, te explicaré paso a paso y te diré en qué página puedes leer más si quieres profundizar. ✍️
 
 ⚡️ Además, iré mejorando con el tiempo: pronto podrás descargar libros📚, encontrar canales de YouTube🌐 recomendados y hasta ver películas🎬 relacionadas con la carrera.
 
 Usa los botones de abajo para buscar bibliografía sobre asignaturas específicas o pregúntame lo que quieras!👇""",
-            reply_markup=keyboard,
-        )
+                reply_markup=keyboard,
+            )
+        else:
+            bot.reply_to(
+                message,
+                "Seleccione otra asignatura o hágame una pregunta",
+                reply_markup=keyboard,
+            )
+
+        # Guardar los datos de los usuarios cada vez que se ejecuta el comando /start
+        save_data(USER_DATA_FILE, dic)
     else:
         bot.reply_to(
-            message,
-            "Seleccione otra asignatura o hágame una pregunta",
-            reply_markup=keyboard,
+            message, "El comando /start solo está disponible en el chat privado."
         )
-
-    # Guardar los datos de los usuarios cada vez que se ejecuta el comando /start
-    save_data(USER_DATA_FILE, dic)
-
-
-def AM1(message):
-    dic[message.chat.id]["asignatura"] = "AM1"
-    bot.send_message(message.chat.id, "AM1", reply_markup=buttons())
-
-
-def AM2(message):
-    dic[message.chat.id]["asignatura"] = "AM2"
-    bot.send_message(message.chat.id, "AM2", reply_markup=buttons())
-
-
-def AL(message):
-    dic[message.chat.id]["asignatura"] = "AL"
-    bot.send_message(
-        message.chat.id, "hola bienvenido a Álgebra", reply_markup=buttons()
-    )
-
-
-def L(message):
-    dic[message.chat.id]["asignatura"] = "L"
-    bot.send_message(message.chat.id, "Lógica", reply_markup=buttons())
-
-
-def ProCsharp(message):
-    dic[message.chat.id]["asignatura"] = "C#"
-    bot.send_message(message.chat.id, "Programación_C#", reply_markup=buttons())
-
-
-def ProPython(message):
-    dic[message.chat.id]["asignatura"] = "py"
-    bot.send_message(message.chat.id, "Programación_python", reply_markup=buttons())
-
-
-def Mate(message):
-    dic[message.chat.id]["asignatura"] = "Mat"
-    bot.send_message(message.chat.id, "matemática", reply_markup=buttons_mat())
-
-
-_reservadas = {
-    "AM1": AM1,
-    "AM2": AM2,
-    "Álgebra": AL,
-    "Lógica": L,
-    "C#": ProCsharp,
-    "python": ProPython,
-    "Matemática": Mate,
-    "🔙": start,
-}
-_examen = [
-    "TC1",
-    "TC2",
-    "TC3",
-    "Mundiales",
-    "Ordinarios",
-    "Extras",
-    "Libros",
-    "Youtube",
-]
-_mates = ["IAM", "IA", "GA", "IM", "FVR", "AL"]
 
 
 @bot.message_handler(content_types=["text"])
 def text_handler(message):
-    if message.text.startswith("/"):
-        bot.send_message(message.chat.id, "Comando no disponible")
-    if message.text in _reservadas.keys():
-        _reservadas[message.text](message)
-
-    elif message.text in _examen and len(dic[message.chat.id]) != 0:
-        indice = buscar(_examen, message.text)
-        enviar_doc(bot, _examen[indice], message)
-    elif (
-        message.text in _mates
-        and not (message.text in _examen)
-        and len(dic[message.chat.id]) != 0
-    ):
-        indice = buscar(_mates, message.text)
-        enviar_doc_mat(bot, _mates[indice], message)
-    else:
+    # Verificar si el bot está en un grupo
+    if message.chat.type in ["group", "supergroup"]:
+        # Responder solo de forma amable o académica, sin mostrar botones
         es_trivial = evaluar_trivialidad(message.text)
         bot.send_chat_action(message.chat.id, "typing")
         if "True" in es_trivial:
             respuesta_amable(message.chat.id, message.text)
         else:
             respuesta_academica(message.chat.id, message.text)
-    # Guardar los datos de los usuarios cada vez que se maneja un mensaje de texto
-    save_data(USER_DATA_FILE, dic)
+    else:
+        # Comportamiento estándar en chat privado
+        if message.text.startswith("/"):
+            bot.send_message(message.chat.id, "Comando no disponible")
+        elif message.text in _reservadas.keys():
+            _reservadas[message.text](message)
+        elif message.text in _examen and len(dic[message.chat.id]) != 0:
+            indice = buscar(_examen, message.text)
+            enviar_doc(bot, _examen[indice], message)
+        elif (
+            message.text in _mates
+            and not (message.text in _examen)
+            and len(dic[message.chat.id]) != 0
+        ):
+            indice = buscar(_mates, message.text)
+            enviar_doc_mat(bot, _mates[indice], message)
+        else:
+            es_trivial = evaluar_trivialidad(message.text)
+            bot.send_chat_action(message.chat.id, "typing")
+            if "True" in es_trivial:
+                respuesta_amable(message.chat.id, message.text)
+            else:
+                respuesta_academica(message.chat.id, message.text)
+
+        # Guardar los datos de los usuarios cada vez que se maneja un mensaje de texto
+        save_data(USER_DATA_FILE, dic)
 
 
 def respuesta_academica(chat_id, question):
@@ -203,6 +159,5 @@ def respuesta_amable(chat_id, message):
     )
 
 
-# save_index, save_chunks = procesar_libros()
-
+# Iniciar el bot
 bot.infinity_polling()
