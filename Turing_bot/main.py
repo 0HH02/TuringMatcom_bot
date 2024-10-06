@@ -80,7 +80,7 @@ def handle_turing(message):
         if len(message.text.split()) > 1:
             # Eliminar el comando y dejar solo el mensaje como argumento
             pregunta = message.text.split(" ", 1)[1]
-
+            print(pregunta)
             # Evaluar la pregunta para decidir el tipo de respuesta
             es_trivial = evaluar_trivialidad(pregunta)
             bot.send_chat_action(message.chat.id, "typing")
