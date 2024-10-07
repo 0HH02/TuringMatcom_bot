@@ -80,14 +80,13 @@ def handle_turing(message):
         if len(message.text.split()) > 1:
             # Eliminar el comando y dejar solo el mensaje como argumento
             pregunta = message.text.split(" ", 1)[1]
-            print(pregunta)
             # Evaluar la pregunta para decidir el tipo de respuesta
             es_trivial = evaluar_trivialidad(pregunta)
             bot.send_chat_action(message.chat.id, "typing")
             if "True" in es_trivial:
-                respuesta_amable(message.chat.id, pregunta)
+                respuesta_amable(message, pregunta, bot.reply_to)
             else:
-                respuesta_academica(message.chat.id, pregunta)
+                respuesta_academica(message, pregunta, bot.reply_to)
         else:
             bot.reply_to(
                 message,
@@ -160,6 +159,7 @@ _mates = ["IAM", "IA", "GA", "IM", "FVR", "AL"]
 @bot.message_handler(content_types=["text"])
 def text_handler(message):
     # Verificar si el bot está en un grupo
+    print(message.text)
     if message.chat.type == "private":
         # Comportamiento estándar en chat privado
         if message.text.startswith("/"):
@@ -180,21 +180,25 @@ def text_handler(message):
             es_trivial = evaluar_trivialidad(message.text)
             bot.send_chat_action(message.chat.id, "typing")
             if "True" in es_trivial:
-                respuesta_amable(message.chat.id, message.text)
+                respuesta_amable(message.chat.id, message.text, bot.send_message)
             else:
-                respuesta_academica(message.chat.id, message.text)
+                respuesta_academica(message, message.text, bot.send_message)
 
         # Guardar los datos de los usuarios cada vez que se maneja un mensaje de texto
         save_data(USER_DATA_FILE, dic)
 
 
-def respuesta_academica(chat_id, question):
+def respuesta_academica(message, question, answer_form):
     if question:
         try:
-            update_or_send_message(bot, chat_id, "Buscando respuesta a la pregunta...")
+            update_or_send_message(
+                bot, message.chat.id, "Buscando respuesta a la pregunta..."
+            )
             question_embedding = embed_question(question)
-            update_or_send_message(bot, chat_id, "Buscando fragmentos similares...")
-            bot.send_chat_action(chat_id, "typing")
+            update_or_send_message(
+                bot, message.chat.id, "Buscando fragmentos similares..."
+            )
+            bot.send_chat_action(message.chat.id, "typing")
             similar_chunks = search_similar_chunks_sklearn(
                 question_embedding=question_embedding,
                 index_model=save_index,
@@ -202,7 +206,7 @@ def respuesta_academica(chat_id, question):
             )
             if not similar_chunks:
                 update_or_send_message(
-                    bot, chat_id, "No se encontraron resultados relevantes."
+                    bot, message.chat.id, "No se encontraron resultados relevantes."
                 )
             else:
                 answer, pages, book_references = generate_answer(
@@ -220,24 +224,31 @@ def respuesta_academica(chat_id, question):
                     f"**Referencias de libros:** {book_references_formatted}"
                 )
                 try:
-                    bot.send_message(chat_id, response, parse_mode="Markdown")
+                    if answer_form == bot.reply_to:
+                        answer_form(message, response, parse_mode="Markdown")
+                    else:
+                        answer_form(message.chat.id, response, parse_mode="Markdown")
+
                 except Exception as e:
                     print(book_references_formatted)
-                    bot.send_message(chat_id, response)
+                    if answer_form == bot.reply_to:
+                        answer_form(message, response)
+                    else:
+                        answer_form(message.chat.id, response)
 
         except Exception as e:
-            bot.send_message(chat_id, f"Se produjo un error: {str(e)}")
+            bot.send_message(message.chat.id, f"Se produjo un error: {str(e)}")
 
 
-def respuesta_amable(chat_id, message):
-    bot.send_message(
+def respuesta_amable(chat_id, message, answer_form):
+    answer_form(
         chat_id,
         respuesta_amable_api(message),
         parse_mode="Markdown",
     )
 
 
-# save_index, save_chunks = procesar_libros()
+save_index, save_chunks = procesar_libros()
 
 # Iniciar el bot
 bot.infinity_polling()
