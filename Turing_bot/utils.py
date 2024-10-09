@@ -118,7 +118,8 @@ def crear_botones_yt(yt):
     m = InlineKeyboardMarkup()
     for i in yt:
         a = i[:-1]
-        boton = InlineKeyboardButton(str(a), callback_data=str(a))
+        a = a.split(",")
+        boton = InlineKeyboardButton(str(a[0]), url=str(a[1]))
         m.add(boton)
     return m
 
