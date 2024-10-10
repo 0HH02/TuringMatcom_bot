@@ -98,39 +98,65 @@ def handle_turing(message):
 
 def AM1(message):
     dic[message.chat.id]["asignatura"] = "AM1"
-    bot.send_message(message.chat.id, "AM1", reply_markup=buttons())
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Análisis Matemático1",
+        reply_markup=buttons(),
+    )
 
 
 def AM2(message):
     dic[message.chat.id]["asignatura"] = "AM2"
-    bot.send_message(message.chat.id, "AM2", reply_markup=buttons())
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Análisis Matemático2",
+        reply_markup=buttons(),
+    )
 
 
 def AL(message):
     dic[message.chat.id]["asignatura"] = "AL"
     bot.send_message(
-        message.chat.id, "hola bienvenido a Álgebra", reply_markup=buttons()
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Álgebra",
+        reply_markup=buttons(),
     )
 
 
 def L(message):
     dic[message.chat.id]["asignatura"] = "L"
-    bot.send_message(message.chat.id, "Lógica", reply_markup=buttons())
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Lógica",
+        reply_markup=buttons(),
+    )
 
 
 def ProCsharp(message):
     dic[message.chat.id]["asignatura"] = "C#"
-    bot.send_message(message.chat.id, "Programación_C#", reply_markup=buttons())
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Programación_C#",
+        reply_markup=buttons(),
+    )
 
 
 def ProPython(message):
     dic[message.chat.id]["asignatura"] = "py"
-    bot.send_message(message.chat.id, "Programación_python", reply_markup=buttons())
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Programación_python",
+        reply_markup=buttons(),
+    )
 
 
 def Mate(message):
     dic[message.chat.id]["asignatura"] = "Mat"
-    bot.send_message(message.chat.id, "matemática", reply_markup=buttons_mat())
+    bot.send_message(
+        message.chat.id,
+        "hola, se encontrara en la sección de matemática",
+        reply_markup=buttons_mat(),
+    )
 
 
 _reservadas = {
