@@ -1,3 +1,1 @@
-nombre1,https://enlace1.com
-nombre2,https://enlace1.com
-nombre3,https://enlace1.com
+Mouredev-python,https://www.youtube.com/watch?v=Kp4Mvapo5kc&list=PLNdFk2_brsRdgQXLIlKBXQDeRf3qvXVU_
