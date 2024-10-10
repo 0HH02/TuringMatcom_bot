@@ -1,3 +1,2 @@
-nombre1,https://enlace1.com
-nombre2,https://enlace1.com
-nombre3,https://enlace1.com
+Traductor de ingeniería,https://www.youtube.com/results?search_query=traductor+de+ingenieria
+profe alex,https://www.youtube.com/@MatematicasprofeAlex

@@ -1,3 +1,1 @@
-nombre1,https://enlace1.com
-nombre2,https://enlace1.com
-nombre3,https://enlace1.com
+profe alex,https://www.youtube.com/@MatematicasprofeAlex
