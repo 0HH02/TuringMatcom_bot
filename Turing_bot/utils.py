@@ -7,7 +7,6 @@ import re
 import os
 
 dic = {}
-docu = []
 
 
 def buscar(lista, target):
@@ -118,19 +117,10 @@ def crear_botones_yt(yt):
     m = InlineKeyboardMarkup()
     for i in yt:
         a = i[:-1]
-        boton = InlineKeyboardButton(str(a), callback_data=str(a))
+        a = a.split(",")
+        boton = InlineKeyboardButton(str(a[0]), url=str(a[1]))
         m.add(boton)
     return m
-
-
-def quitar_ds(lista):
-    a = []
-    if ".DS_Store" in lista:
-        for i in lista:
-            if i != ".DS_Store":
-                a.append(i)
-        return a
-    return lista
 
 
 def buscar_en_archivo(ruta, data):
@@ -189,7 +179,6 @@ def enviar_doc(bot, doc, message):
         )
 
         lista = os.listdir(ruta)
-        docu = quitar_ds(lista)
 
         @bot.callback_query_handler(func=lambda call: True)
         def handle_query(call):
@@ -240,3 +229,66 @@ def escape_markdown(text):
 
     # Escapar todos los caracteres especiales con una barra invertida (\)
     return re.sub(special_characters, r"\\\1", text)
+
+
+def AM1(bot, message):
+    dic[message.chat.id]["asignatura"] = "AM1"
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Análisis Matemático1",
+        reply_markup=buttons(),
+    )
+
+
+def AM2(bot, message):
+    dic[message.chat.id]["asignatura"] = "AM2"
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Análisis Matemático2",
+        reply_markup=buttons(),
+    )
+
+
+def AL(bot, message):
+    dic[message.chat.id]["asignatura"] = "AL"
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Álgebra",
+        reply_markup=buttons(),
+    )
+
+
+def L(bot, message):
+    dic[message.chat.id]["asignatura"] = "L"
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Lógica",
+        reply_markup=buttons(),
+    )
+
+
+def ProCsharp(bot, message):
+    dic[message.chat.id]["asignatura"] = "C#"
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Programación_C#",
+        reply_markup=buttons(),
+    )
+
+
+def ProPython(bot, message):
+    dic[message.chat.id]["asignatura"] = "py"
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará lo relacionado con la asignatura Programación_python",
+        reply_markup=buttons(),
+    )
+
+
+def Mate(bot, message):
+    dic[message.chat.id]["asignatura"] = "Mat"
+    bot.send_message(
+        message.chat.id,
+        "hola, acá encontrará el contenido de la carrera de matemática",
+        reply_markup=buttons_mat(),
+    )

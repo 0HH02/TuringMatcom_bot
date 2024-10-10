@@ -10,8 +10,6 @@ from data_processing import (
 )
 from config import TOKEN
 from utils import (
-    buttons,
-    buttons_mat,
     enviar_doc,
     enviar_doc_mat,
     dic,
@@ -20,6 +18,13 @@ from utils import (
     buscar,
     load_data,
     save_data,
+    AM1,
+    AM2,
+    AL,
+    L,
+    ProCsharp,
+    ProPython,
+    Mate,
 )
 from ai import (
     generate_answer,
@@ -96,43 +101,6 @@ def handle_turing(message):
         bot.reply_to(message, "Este comando solo se puede usar en grupos.")
 
 
-def AM1(message):
-    dic[message.chat.id]["asignatura"] = "AM1"
-    bot.send_message(message.chat.id, "AM1", reply_markup=buttons())
-
-
-def AM2(message):
-    dic[message.chat.id]["asignatura"] = "AM2"
-    bot.send_message(message.chat.id, "AM2", reply_markup=buttons())
-
-
-def AL(message):
-    dic[message.chat.id]["asignatura"] = "AL"
-    bot.send_message(
-        message.chat.id, "hola bienvenido a Álgebra", reply_markup=buttons()
-    )
-
-
-def L(message):
-    dic[message.chat.id]["asignatura"] = "L"
-    bot.send_message(message.chat.id, "Lógica", reply_markup=buttons())
-
-
-def ProCsharp(message):
-    dic[message.chat.id]["asignatura"] = "C#"
-    bot.send_message(message.chat.id, "Programación_C#", reply_markup=buttons())
-
-
-def ProPython(message):
-    dic[message.chat.id]["asignatura"] = "py"
-    bot.send_message(message.chat.id, "Programación_python", reply_markup=buttons())
-
-
-def Mate(message):
-    dic[message.chat.id]["asignatura"] = "Mat"
-    bot.send_message(message.chat.id, "matemática", reply_markup=buttons_mat())
-
-
 _reservadas = {
     "AM1": AM1,
     "AM2": AM2,
@@ -141,7 +109,6 @@ _reservadas = {
     "C#": ProCsharp,
     "python": ProPython,
     "Matemática": Mate,
-    "🔙": start,
 }
 _examen = [
     "TC1",
@@ -165,7 +132,9 @@ def text_handler(message):
         if message.text.startswith("/"):
             bot.send_message(message.chat.id, "Comando no disponible")
         elif message.text in _reservadas.keys():
-            _reservadas[message.text](message)
+            _reservadas[message.text](bot, message)
+        elif message.text == "🔙":
+            start(message)
         elif message.text in _examen and len(dic[message.chat.id]) != 0:
             indice = buscar(_examen, message.text)
             enviar_doc(bot, _examen[indice], message)
@@ -184,7 +153,7 @@ def text_handler(message):
             else:
                 respuesta_academica(message, message.text, bot.send_message)
 
-        # Guardar los datos de los usuarios cada vez que se maneja un mensaje de texto
+        # Guardar el inicio de seccion para que no tenga que siempre empezar con start, cada vez que se maneja un mensaje de texto
         save_data(USER_DATA_FILE, dic)
 
 
