@@ -208,29 +208,6 @@ def enviar_doc(bot, doc, message):
             )
 
 
-def escape_markdown(text):
-    """
-    Escapa todos los caracteres especiales de Markdown en el texto de entrada.
-
-    Telegram Markdown permite escapar caracteres con el símbolo de barra invertida (\).
-    Esta función escapa todos los caracteres que se deben escapar según la especificación de Markdown.
-
-    Caracteres especiales en Markdown:
-    - `_`, `*`, `[`, `]`, `(`, `)`, `~`, `>`, `#`, `+`, `-`, `=`, `|`, `{`, `}`, `.`, `!`
-
-    Args:
-        text (str): El texto de entrada que debe ser escapado.
-
-    Returns:
-        str: El texto con todos los caracteres especiales de Markdown escapados.
-    """
-    # Lista de caracteres especiales que deben ser escapados
-    special_characters = r"([_*\[\]()~`>#+\-=|{}.!])"
-
-    # Escapar todos los caracteres especiales con una barra invertida (\)
-    return re.sub(special_characters, r"\\\1", text)
-
-
 def AM1(bot, message):
     dic[message.chat.id]["asignatura"] = "AM1"
     bot.send_message(

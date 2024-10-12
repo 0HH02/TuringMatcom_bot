@@ -14,7 +14,6 @@ from utils import (
     enviar_doc_mat,
     dic,
     update_or_send_message,
-    escape_markdown,
     buscar,
     load_data,
     save_data,
