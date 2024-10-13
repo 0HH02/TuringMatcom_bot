@@ -148,14 +148,14 @@ def enviar_doc(bot, doc, message):
         if len(lista) != 0:
             yt = open(os.path.join(ruta, "yt.txt"))
             b = crear_botones_yt(yt)
-            bot.send_chat_action(message.from_user.id, "typing")
+            bot.send_chat_action(message.chat.id, "typing")
             bot.send_message(
                 message.chat.id,
                 f"Estos son los videos {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
                 reply_markup=b,
             )
         else:
-            bot.send_chat_action(message.from_user.id, "typing")
+            bot.send_chat_action(message.chat.id, "typing")
             bot.send_message(
                 message.chat.id,
                 f"No contamos con videos de {doc} para {dic[message.chat.id]['asignatura']}",
@@ -177,15 +177,15 @@ def enviar_doc(bot, doc, message):
 
         if len(lista) != 0:
             documentos = crear_botones(lista)
-            bot.send_chat_action(message.from_user.id, "typing")
+            bot.send_chat_action(message.chat.id, "typing")
             bot.send_message(
-                message.from_user.id,
+                message.chat.id,
                 f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
                 reply_markup=documentos,
             )
 
         else:
-            bot.send_chat_action(message.from_user.id, "typing")
+            bot.send_chat_action(message.chat.id, "typing")
             bot.send_message(
                 message.chat.id,
                 f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
@@ -218,7 +218,7 @@ def escape_markdown(text):
 def AM1(bot, message):
     dic[message.chat.id]["asignatura"] = "AM1"
     bot.send_message(
-        message.from_user.id,
+        message.chat.id,
         "hola, acá encontrará lo relacionado con la asignatura Análisis Matemático1",
         reply_markup=buttons(),
     )
@@ -227,7 +227,7 @@ def AM1(bot, message):
 def AM2(bot, message):
     dic[message.chat.id]["asignatura"] = "AM2"
     bot.send_message(
-        message.from_user.id,
+        message.chat.id,
         "hola, acá encontrará lo relacionado con la asignatura Análisis Matemático2",
         reply_markup=buttons(),
     )
@@ -236,7 +236,7 @@ def AM2(bot, message):
 def AL(bot, message):
     dic[message.chat.id]["asignatura"] = "AL"
     bot.send_message(
-        message.from_user.id,
+        message.chat.id,
         "hola, acá encontrará lo relacionado con la asignatura Álgebra",
         reply_markup=buttons(),
     )
@@ -245,7 +245,7 @@ def AL(bot, message):
 def L(bot, message):
     dic[message.chat.id]["asignatura"] = "L"
     bot.send_message(
-        message.from_user.id,
+        message.chat.id,
         "hola, acá encontrará lo relacionado con la asignatura Lógica",
         reply_markup=buttons(),
     )
@@ -254,7 +254,7 @@ def L(bot, message):
 def ProCsharp(bot, message):
     dic[message.chat.id]["asignatura"] = "C#"
     bot.send_message(
-        message.from_user.id,
+        message.chat.id,
         "hola, acá encontrará lo relacionado con la asignatura Programación_C#",
         reply_markup=buttons(),
     )
@@ -263,7 +263,7 @@ def ProCsharp(bot, message):
 def ProPython(bot, message):
     dic[message.chat.id]["asignatura"] = "py"
     bot.send_message(
-        message.from_user.id,
+        message.chat.id,
         "hola, acá encontrará lo relacionado con la asignatura Programación_python",
         reply_markup=buttons(),
     )
@@ -272,7 +272,7 @@ def ProPython(bot, message):
 def Mate(bot, message):
     dic[message.chat.id]["asignatura"] = "Mat"
     bot.send_message(
-        message.from_user.id,
+        message.chat.id,
         "hola, acá encontrará el contenido de la carrera de matemática",
         reply_markup=buttons_mat(),
     )

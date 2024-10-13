@@ -126,7 +126,7 @@ def text_handler(message):
     if message.chat.type == "private":
         # Comportamiento estándar en chat privado
         if message.text.startswith("/"):
-            bot.send_message(message.from_user.id, "Comando no disponible")
+            bot.send_message(message.chat.id, "Comando no disponible")
         elif message.text in _reservadas.keys():
             _reservadas[message.text](bot, message)
         elif message.text == "🔙":
@@ -145,7 +145,7 @@ def text_handler(message):
             es_trivial = evaluar_trivialidad(message.text)
             bot.send_chat_action(message.chat.id, "typing")
             if "True" in es_trivial:
-                respuesta_amable(message.from_user.id, message.text, bot.send_message)
+                respuesta_amable(message.chat.id, message.text, bot.send_message)
             else:
                 respuesta_academica(message, message.text, bot.send_message)
 
@@ -157,11 +157,11 @@ def respuesta_academica(message, question, answer_form):
     if question:
         try:
             update_or_send_message(
-                bot, message.from_user.id, "Buscando respuesta a la pregunta..."
+                bot, message.chat.id, "Buscando respuesta a la pregunta..."
             )
             question_embedding = embed_question(question)
             update_or_send_message(
-                bot, message.from_user.id, "Buscando fragmentos similares..."
+                bot, message.chat.id, "Buscando fragmentos similares..."
             )
             bot.send_chat_action(message.chat.id, "typing")
             similar_chunks = search_similar_chunks_sklearn(
@@ -194,19 +194,17 @@ def respuesta_academica(message, question, answer_form):
                     if answer_form == bot.reply_to:
                         answer_form(message, response, parse_mode="Markdown")
                     else:
-                        answer_form(
-                            message.from_user.id, response, parse_mode="Markdown"
-                        )
+                        answer_form(message.chat.id, response, parse_mode="Markdown")
 
                 except Exception as e:
                     print(book_references_formatted)
                     if answer_form == bot.reply_to:
                         answer_form(message, response)
                     else:
-                        answer_form(message.from_user.id, response)
+                        answer_form(message.chat.id, response)
 
         except Exception as e:
-            bot.send_message(message.from_user.id, f"Se produjo un error: {str(e)}")
+            bot.send_message(message.chat.id, f"Se produjo un error: {str(e)}")
 
 
 def respuesta_amable(chat_id, message, answer_form):
