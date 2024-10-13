@@ -58,9 +58,30 @@ def start(message):
 
 ⚡️ Además, iré mejorando con el tiempo: pronto podrás descargar libros📚, encontrar canales de YouTube🌐 recomendados y hasta ver películas🎬 relacionadas con la carrera.
 
-Usa los botones de abajo para buscar bibliografía sobre asignaturas específicas o pregúntame lo que quieras!👇""",
+Usa los botones de abajo para buscar bibliografía sobre asignaturas específicas o pregúntame lo que quieras!👇
+
+
+Es importante conocer mis posibilidades y mis limitaciones.
+
+
+🚫Cosas que no puedo hacer bien:
+
+- Resolver ejercicios de lógica y matemáticas, tampoco sabe hacer operaciones matemáticas.
+- Responder preguntas que se vayan del contexto de los libros de la carrera.
+- Recordar de qué se está hablando en la conversación. Solamente tiene memoria de lo que le preguntas en el momento.
+
+
+✅Cosas que si puedo hacer:
+
+- Buscar entre todos los libros las definiciones que das en clase y crearte una respuesta basándose en eso.
+- Recomendar los libros en los que se hablan de conceptos similares para que puedas profundizar más y proporcionarte una aproximación de las páginas donde se habla de ellos.
+
+Se recomienda tener cuidado con las respuestas porque puede contener alucinaciones. Puedo responder cosas con total seguridad y estar equivocado. Antes de creerme comprueba en la documentación oficial.
+""",
                 reply_markup=keyboard,
             )
+            # Guardar los datos de los usuarios cada vez que se ejecuta el comando /start
+            save_data(USER_DATA_FILE, dic)
         else:
             bot.reply_to(
                 message,
@@ -68,8 +89,6 @@ Usa los botones de abajo para buscar bibliografía sobre asignaturas específica
                 reply_markup=keyboard,
             )
 
-        # Guardar los datos de los usuarios cada vez que se ejecuta el comando /start
-        save_data(USER_DATA_FILE, dic)
     else:
         bot.reply_to(
             message, "El comando /start solo está disponible en el chat privado."
@@ -87,7 +106,7 @@ def handle_turing(message):
             pregunta = message.text.split(" ", 1)[1]
             # Evaluar la pregunta para decidir el tipo de respuesta
             es_trivial = evaluar_trivialidad(pregunta)
-            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_chat_action(message.from_user.id, "typing")
             if "True" in es_trivial:
                 respuesta_amable(message, pregunta, bot.reply_to)
             else:
@@ -126,46 +145,51 @@ _mates = ["IAM", "IA", "GA", "IM", "FVR", "AL"]
 @bot.message_handler(content_types=["text"])
 def text_handler(message):
     # Verificar si el bot está en un grupo
-    print(message.text)
-    if message.chat.type == "private":
-        # Comportamiento estándar en chat privado
-        if message.text.startswith("/"):
-            bot.send_message(message.chat.id, "Comando no disponible")
-        elif message.text in _reservadas.keys():
-            _reservadas[message.text](bot, message)
-        elif message.text == "🔙":
-            start(message)
-        elif message.text in _examen and len(dic[message.chat.id]) != 0:
-            indice = buscar(_examen, message.text)
-            enviar_doc(bot, _examen[indice], message)
-        elif (
-            message.text in _mates
-            and not (message.text in _examen)
-            and len(dic[message.chat.id]) != 0
-        ):
-            indice = buscar(_mates, message.text)
-            enviar_doc_mat(bot, _mates[indice], message)
-        else:
-            es_trivial = evaluar_trivialidad(message.text)
-            bot.send_chat_action(message.chat.id, "typing")
-            if "True" in es_trivial:
-                respuesta_amable(message.chat.id, message.text, bot.send_message)
+    try:
+        print(message.text)
+        if message.chat.type == "private":
+            # Comportamiento estándar en chat privado
+            if message.text.startswith("/"):
+                bot.send_message(message.from_user.id, "Comando no disponible")
+            elif message.text in _reservadas.keys():
+                _reservadas[message.text](bot, message)
+            elif message.text == "🔙":
+                start(message)
+            elif message.text in _examen and len(dic[message.chat.id]) != 0:
+                indice = buscar(_examen, message.text)
+                enviar_doc(bot, _examen[indice], message)
+            elif (
+                message.text in _mates
+                and not (message.text in _examen)
+                and len(dic[message.chat.id]) != 0
+            ):
+                indice = buscar(_mates, message.text)
+                enviar_doc_mat(bot, _mates[indice], message)
             else:
-                respuesta_academica(message, message.text, bot.send_message)
+                es_trivial = evaluar_trivialidad(message.text)
+                bot.send_chat_action(message.chat.id, "typing")
+                if "True" in es_trivial:
+                    respuesta_amable(
+                        message.from_user.id, message.text, bot.send_message
+                    )
+                else:
+                    respuesta_academica(message, message.text, bot.send_message)
 
-        # Guardar el inicio de seccion para que no tenga que siempre empezar con start, cada vez que se maneja un mensaje de texto
-        save_data(USER_DATA_FILE, dic)
+            # Guardar el inicio de seccion para que no tenga que siempre empezar con start, cada vez que se maneja un mensaje de texto
+            save_data(USER_DATA_FILE, dic)
+    except:
+        bot.send_message(message.from_user.id, "utilice el comado /start para empezar")
 
 
 def respuesta_academica(message, question, answer_form):
     if question:
         try:
             update_or_send_message(
-                bot, message.chat.id, "Buscando respuesta a la pregunta..."
+                bot, message.from_user.id, "Buscando respuesta a la pregunta..."
             )
             question_embedding = embed_question(question)
             update_or_send_message(
-                bot, message.chat.id, "Buscando fragmentos similares..."
+                bot, message.from_user.id, "Buscando fragmentos similares..."
             )
             bot.send_chat_action(message.chat.id, "typing")
             similar_chunks = search_similar_chunks_sklearn(
@@ -175,7 +199,9 @@ def respuesta_academica(message, question, answer_form):
             )
             if not similar_chunks:
                 update_or_send_message(
-                    bot, message.chat.id, "No se encontraron resultados relevantes."
+                    bot,
+                    message.from_user.id,
+                    "No se encontraron resultados relevantes.",
                 )
             else:
                 answer, pages, book_references = generate_answer(
@@ -196,17 +222,19 @@ def respuesta_academica(message, question, answer_form):
                     if answer_form == bot.reply_to:
                         answer_form(message, response, parse_mode="Markdown")
                     else:
-                        answer_form(message.chat.id, response, parse_mode="Markdown")
+                        answer_form(
+                            message.from_user.id, response, parse_mode="Markdown"
+                        )
 
                 except Exception as e:
                     print(book_references_formatted)
                     if answer_form == bot.reply_to:
                         answer_form(message, response)
                     else:
-                        answer_form(message.chat.id, response)
+                        answer_form(message.from_user.id, response)
 
         except Exception as e:
-            bot.send_message(message.chat.id, f"Se produjo un error: {str(e)}")
+            bot.send_message(message.from_user.id, f"Se produjo un error: {str(e)}")
 
 
 def respuesta_amable(chat_id, message, answer_form):

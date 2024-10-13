@@ -80,35 +80,26 @@ def buttons_mat():
 def crear_botones(lista):
     m = InlineKeyboardMarkup()
     for i in lista:
-        if i != ".DS_Store":
-            boton = InlineKeyboardButton(str(i), callback_data=str(i))
-            m.add(boton)
+        boton = InlineKeyboardButton(str(i), callback_data=str(i))
+        m.add(boton)
     return m
 
 
 def enviar_doc_mat(bot, doc, message):
-    ruta = "Mat/" + doc
+    ruta = os.path.join("Mat", doc)
     lista_mat = os.listdir(ruta)
     if len(lista_mat) != 0:
-        if lista_mat[0] != ".DS_Store":
-            botones_mat = crear_botones(lista_mat)
-            bot.send_chat_action(message.chat.id, "typing")
-            bot.send_message(
-                message.chat.id,
-                f"Conferencias y clases prácticas",
-                reply_markup=botones_mat,
-            )
-        else:
-            bot.send_chat_action(message.chat.id, "typing")
-            bot.send_message(
-                message.chat.id,
-                f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
-            )
-
-    else:
-        bot.send_chat_action(message.chat.id, "typing")
+        botones_mat = crear_botones(lista_mat)
+        bot.send_chat_action(message.from_user.id, "typing")
         bot.send_message(
-            message.chat.id,
+            message.from_user.id,
+            f"Conferencias y clases prácticas",
+            reply_markup=botones_mat,
+        )
+    else:
+        bot.send_chat_action(message.from_user.id, "typing")
+        bot.send_message(
+            message.from_user.id,
             f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
         )
 
@@ -134,20 +125,20 @@ def download(bot, data, message):
     ruta = buscar_en_archivo("Examenes", data)
     if ruta:
         abrir = open(ruta, "rb")
-        bot.send_chat_action(message.chat.id, "upload_document")
-        bot.send_document(message.chat.id, abrir)
+        bot.send_chat_action(message.from_user.id, "upload_document")
+        bot.send_document(message.from_user.id, abrir)
     else:
         ruta = buscar_en_archivo("Libros", data)
         if ruta:
             abrir = open(ruta, "rb")
-            bot.send_chat_action(message.chat.id, "upload_document")
-            bot.send_document(message.chat.id, abrir)
+            bot.send_chat_action(message.from_user.id, "upload_document")
+            bot.send_document(message.from_user.id, abrir)
         else:
             ruta = buscar_en_archivo("Mat", data)
             if ruta:
                 abrir = open(ruta, "rb")
-                bot.send_chat_action(message.chat.id, "upload_document")
-                bot.send_document(message.chat.id, abrir)
+                bot.send_chat_action(message.from_user.id, "upload_document")
+                bot.send_document(message.from_user.id, abrir)
 
 
 def enviar_doc(bot, doc, message):
@@ -157,14 +148,14 @@ def enviar_doc(bot, doc, message):
         if len(lista) != 0:
             yt = open(os.path.join(ruta, "yt.txt"))
             b = crear_botones_yt(yt)
-            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_chat_action(message.from_user.id, "typing")
             bot.send_message(
                 message.chat.id,
                 f"Estos son los videos {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
                 reply_markup=b,
             )
         else:
-            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_chat_action(message.from_user.id, "typing")
             bot.send_message(
                 message.chat.id,
                 f"No contamos con videos de {doc} para {dic[message.chat.id]['asignatura']}",
@@ -185,23 +176,16 @@ def enviar_doc(bot, doc, message):
             download(bot, call.data, message)
 
         if len(lista) != 0:
-            if len(lista) == 1 and lista[0] == ".DS_Store":
-                bot.send_chat_action(message.chat.id, "typing")
-                bot.send_message(
-                    message.chat.id,
-                    f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
-                )
-            else:
-                documentos = crear_botones(lista)
-                bot.send_chat_action(message.chat.id, "typing")
-                bot.send_message(
-                    message.chat.id,
-                    f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
-                    reply_markup=documentos,
-                )
+            documentos = crear_botones(lista)
+            bot.send_chat_action(message.from_user.id, "typing")
+            bot.send_message(
+                message.from_user.id,
+                f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
+                reply_markup=documentos,
+            )
 
         else:
-            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_chat_action(message.from_user.id, "typing")
             bot.send_message(
                 message.chat.id,
                 f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
@@ -234,7 +218,7 @@ def escape_markdown(text):
 def AM1(bot, message):
     dic[message.chat.id]["asignatura"] = "AM1"
     bot.send_message(
-        message.chat.id,
+        message.from_user.id,
         "hola, acá encontrará lo relacionado con la asignatura Análisis Matemático1",
         reply_markup=buttons(),
     )
@@ -243,7 +227,7 @@ def AM1(bot, message):
 def AM2(bot, message):
     dic[message.chat.id]["asignatura"] = "AM2"
     bot.send_message(
-        message.chat.id,
+        message.from_user.id,
         "hola, acá encontrará lo relacionado con la asignatura Análisis Matemático2",
         reply_markup=buttons(),
     )
@@ -252,7 +236,7 @@ def AM2(bot, message):
 def AL(bot, message):
     dic[message.chat.id]["asignatura"] = "AL"
     bot.send_message(
-        message.chat.id,
+        message.from_user.id,
         "hola, acá encontrará lo relacionado con la asignatura Álgebra",
         reply_markup=buttons(),
     )
@@ -261,7 +245,7 @@ def AL(bot, message):
 def L(bot, message):
     dic[message.chat.id]["asignatura"] = "L"
     bot.send_message(
-        message.chat.id,
+        message.from_user.id,
         "hola, acá encontrará lo relacionado con la asignatura Lógica",
         reply_markup=buttons(),
     )
@@ -270,7 +254,7 @@ def L(bot, message):
 def ProCsharp(bot, message):
     dic[message.chat.id]["asignatura"] = "C#"
     bot.send_message(
-        message.chat.id,
+        message.from_user.id,
         "hola, acá encontrará lo relacionado con la asignatura Programación_C#",
         reply_markup=buttons(),
     )
@@ -279,7 +263,7 @@ def ProCsharp(bot, message):
 def ProPython(bot, message):
     dic[message.chat.id]["asignatura"] = "py"
     bot.send_message(
-        message.chat.id,
+        message.from_user.id,
         "hola, acá encontrará lo relacionado con la asignatura Programación_python",
         reply_markup=buttons(),
     )
@@ -288,7 +272,7 @@ def ProPython(bot, message):
 def Mate(bot, message):
     dic[message.chat.id]["asignatura"] = "Mat"
     bot.send_message(
-        message.chat.id,
+        message.from_user.id,
         "hola, acá encontrará el contenido de la carrera de matemática",
         reply_markup=buttons_mat(),
     )
