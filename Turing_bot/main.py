@@ -37,8 +37,8 @@ bot = telebot.TeleBot(TOKEN)
 USER_DATA_FILE = "user_data.pkl"
 
 # Cargar los datos de los usuarios al iniciar el bot
-if os.path.exists(USER_DATA_FILE):
-    dic.update(load_data(USER_DATA_FILE))
+# if os.path.exists(USER_DATA_FILE):
+#   dic.update(load_data(USER_DATA_FILE))
 
 
 @bot.message_handler(commands=["start"])
@@ -53,35 +53,11 @@ def start(message):
             dic[message.chat.id] = {}
             bot.reply_to(
                 message,
-                """🎉Bienvenido al Proyecto Turing🎉 
-🤖 Soy tu nuevo tutor virtual, creado por los propios estudiantes y una muestra de lo que podrás hacer en poco tiempo. Mi misión es ayudarte a sobrevivir (y triunfar) en las asignaturas de MATCOM. Puedes preguntarme sobre los temas que te están volviendo loco, y yo buscaré la información en los libros de texto, te explicaré paso a paso y te diré en qué página puedes leer más si quieres profundizar. ✍️
-
-⚡️ Además, iré mejorando con el tiempo: pronto podrás descargar libros📚, encontrar canales de YouTube🌐 recomendados y hasta ver películas🎬 relacionadas con la carrera.
-
-Usa los botones de abajo para buscar bibliografía sobre asignaturas específicas o pregúntame lo que quieras!👇
-
-
-Es importante conocer mis posibilidades y mis limitaciones.
-
-
-🚫Cosas que no puedo hacer bien:
-
-- Resolver ejercicios de lógica y matemáticas, tampoco sabe hacer operaciones matemáticas.
-- Responder preguntas que se vayan del contexto de los libros de la carrera.
-- Recordar de qué se está hablando en la conversación. Solamente tiene memoria de lo que le preguntas en el momento.
-
-
-✅Cosas que si puedo hacer:
-
-- Buscar entre todos los libros las definiciones que das en clase y crearte una respuesta basándose en eso.
-- Recomendar los libros en los que se hablan de conceptos similares para que puedas profundizar más y proporcionarte una aproximación de las páginas donde se habla de ellos.
-
-Se recomienda tener cuidado con las respuestas porque puede contener alucinaciones. Puedo responder cosas con total seguridad y estar equivocado. Antes de creerme comprueba en la documentación oficial.
-""",
+                """ """,
                 reply_markup=keyboard,
             )
             # Guardar los datos de los usuarios cada vez que se ejecuta el comando /start
-            save_data(USER_DATA_FILE, dic)
+        # save_data(USER_DATA_FILE, dic)
         else:
             bot.reply_to(
                 message,
@@ -145,40 +121,36 @@ _mates = ["IAM", "IA", "GA", "IM", "FVR", "AL"]
 @bot.message_handler(content_types=["text"])
 def text_handler(message):
     # Verificar si el bot está en un grupo
-    try:
-        print(message.text)
-        if message.chat.type == "private":
-            # Comportamiento estándar en chat privado
-            if message.text.startswith("/"):
-                bot.send_message(message.from_user.id, "Comando no disponible")
-            elif message.text in _reservadas.keys():
-                _reservadas[message.text](bot, message)
-            elif message.text == "🔙":
-                start(message)
-            elif message.text in _examen and len(dic[message.chat.id]) != 0:
-                indice = buscar(_examen, message.text)
-                enviar_doc(bot, _examen[indice], message)
-            elif (
-                message.text in _mates
-                and not (message.text in _examen)
-                and len(dic[message.chat.id]) != 0
-            ):
-                indice = buscar(_mates, message.text)
-                enviar_doc_mat(bot, _mates[indice], message)
-            else:
-                es_trivial = evaluar_trivialidad(message.text)
-                bot.send_chat_action(message.chat.id, "typing")
-                if "True" in es_trivial:
-                    respuesta_amable(
-                        message.from_user.id, message.text, bot.send_message
-                    )
-                else:
-                    respuesta_academica(message, message.text, bot.send_message)
 
-            # Guardar el inicio de seccion para que no tenga que siempre empezar con start, cada vez que se maneja un mensaje de texto
-            save_data(USER_DATA_FILE, dic)
-    except:
-        bot.send_message(message.from_user.id, "utilice el comado /start para empezar")
+    print(message.text)
+    if message.chat.type == "private":
+        # Comportamiento estándar en chat privado
+        if message.text.startswith("/"):
+            bot.send_message(message.from_user.id, "Comando no disponible")
+        elif message.text in _reservadas.keys():
+            _reservadas[message.text](bot, message)
+        elif message.text == "🔙":
+            start(message)
+        elif message.text in _examen and len(dic[message.chat.id]) != 0:
+            indice = buscar(_examen, message.text)
+            enviar_doc(bot, _examen[indice], message)
+        elif (
+            message.text in _mates
+            and not (message.text in _examen)
+            and len(dic[message.chat.id]) != 0
+        ):
+            indice = buscar(_mates, message.text)
+            enviar_doc_mat(bot, _mates[indice], message)
+        else:
+            es_trivial = evaluar_trivialidad(message.text)
+            bot.send_chat_action(message.chat.id, "typing")
+            if "True" in es_trivial:
+                respuesta_amable(message.from_user.id, message.text, bot.send_message)
+            else:
+                respuesta_academica(message, message.text, bot.send_message)
+
+        # Guardar el inicio de seccion para que no tenga que siempre empezar con start, cada vez que se maneja un mensaje de texto
+        # save_data(USER_DATA_FILE, dic)
 
 
 def respuesta_academica(message, question, answer_form):
