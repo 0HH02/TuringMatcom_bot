@@ -36,8 +36,8 @@ bot = telebot.TeleBot(TOKEN)
 USER_DATA_FILE = "user_data.pkl"
 
 # Cargar los datos de los usuarios al iniciar el bot
-if os.path.exists(USER_DATA_FILE):
-    dic.update(load_data(USER_DATA_FILE))
+# if os.path.exists(USER_DATA_FILE):
+#   dic.update(load_data(USER_DATA_FILE))
 
 
 @bot.message_handler(commands=["start"])
@@ -52,14 +52,11 @@ def start(message):
             dic[message.chat.id] = {}
             bot.reply_to(
                 message,
-                """🎉Bienvenido al Proyecto Turing🎉 
-🤖 Soy tu nuevo tutor virtual, creado por los propios estudiantes y una muestra de lo que podrás hacer en poco tiempo. Mi misión es ayudarte a sobrevivir (y triunfar) en las asignaturas de MATCOM. Puedes preguntarme sobre los temas que te están volviendo loco, y yo buscaré la información en los libros de texto, te explicaré paso a paso y te diré en qué página puedes leer más si quieres profundizar. ✍️
-
-⚡️ Además, iré mejorando con el tiempo: pronto podrás descargar libros📚, encontrar canales de YouTube🌐 recomendados y hasta ver películas🎬 relacionadas con la carrera.
-
-Usa los botones de abajo para buscar bibliografía sobre asignaturas específicas o pregúntame lo que quieras!👇""",
+                """ """,
                 reply_markup=keyboard,
             )
+            # Guardar los datos de los usuarios cada vez que se ejecuta el comando /start
+        # save_data(USER_DATA_FILE, dic)
         else:
             bot.reply_to(
                 message,
@@ -67,8 +64,6 @@ Usa los botones de abajo para buscar bibliografía sobre asignaturas específica
                 reply_markup=keyboard,
             )
 
-        # Guardar los datos de los usuarios cada vez que se ejecuta el comando /start
-        save_data(USER_DATA_FILE, dic)
     else:
         bot.reply_to(
             message, "El comando /start solo está disponible en el chat privado."
@@ -86,7 +81,7 @@ def handle_turing(message):
             pregunta = message.text.split(" ", 1)[1]
             # Evaluar la pregunta para decidir el tipo de respuesta
             es_trivial = evaluar_trivialidad(pregunta)
-            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_chat_action(message.from_user.id, "typing")
             if "True" in es_trivial:
                 respuesta_amable(message, pregunta, bot.reply_to)
             else:
@@ -125,6 +120,7 @@ _mates = ["IAM", "IA", "GA", "IM", "FVR", "AL"]
 @bot.message_handler(content_types=["text"])
 def text_handler(message):
     # Verificar si el bot está en un grupo
+
     print(message.text)
     if message.chat.type == "private":
         # Comportamiento estándar en chat privado
@@ -153,7 +149,7 @@ def text_handler(message):
                 respuesta_academica(message, message.text, bot.send_message)
 
         # Guardar el inicio de seccion para que no tenga que siempre empezar con start, cada vez que se maneja un mensaje de texto
-        save_data(USER_DATA_FILE, dic)
+        # save_data(USER_DATA_FILE, dic)
 
 
 def respuesta_academica(message, question, answer_form):
@@ -174,7 +170,9 @@ def respuesta_academica(message, question, answer_form):
             )
             if not similar_chunks:
                 update_or_send_message(
-                    bot, message.chat.id, "No se encontraron resultados relevantes."
+                    bot,
+                    message.from_user.id,
+                    "No se encontraron resultados relevantes.",
                 )
             else:
                 answer, pages, book_references = generate_answer(

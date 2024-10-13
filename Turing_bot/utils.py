@@ -80,35 +80,26 @@ def buttons_mat():
 def crear_botones(lista):
     m = InlineKeyboardMarkup()
     for i in lista:
-        if i != ".DS_Store":
-            boton = InlineKeyboardButton(str(i), callback_data=str(i))
-            m.add(boton)
+        boton = InlineKeyboardButton(str(i), callback_data=str(i))
+        m.add(boton)
     return m
 
 
 def enviar_doc_mat(bot, doc, message):
-    ruta = "Mat/" + doc
+    ruta = os.path.join("Mat", doc)
     lista_mat = os.listdir(ruta)
     if len(lista_mat) != 0:
-        if lista_mat[0] != ".DS_Store":
-            botones_mat = crear_botones(lista_mat)
-            bot.send_chat_action(message.chat.id, "typing")
-            bot.send_message(
-                message.chat.id,
-                f"Conferencias y clases prácticas",
-                reply_markup=botones_mat,
-            )
-        else:
-            bot.send_chat_action(message.chat.id, "typing")
-            bot.send_message(
-                message.chat.id,
-                f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
-            )
-
-    else:
-        bot.send_chat_action(message.chat.id, "typing")
+        botones_mat = crear_botones(lista_mat)
+        bot.send_chat_action(message.from_user.id, "typing")
         bot.send_message(
-            message.chat.id,
+            message.from_user.id,
+            f"Conferencias y clases prácticas",
+            reply_markup=botones_mat,
+        )
+    else:
+        bot.send_chat_action(message.from_user.id, "typing")
+        bot.send_message(
+            message.from_user.id,
             f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
         )
 
@@ -134,20 +125,20 @@ def download(bot, data, message):
     ruta = buscar_en_archivo("Examenes", data)
     if ruta:
         abrir = open(ruta, "rb")
-        bot.send_chat_action(message.chat.id, "upload_document")
-        bot.send_document(message.chat.id, abrir)
+        bot.send_chat_action(message.from_user.id, "upload_document")
+        bot.send_document(message.from_user.id, abrir)
     else:
         ruta = buscar_en_archivo("Libros", data)
         if ruta:
             abrir = open(ruta, "rb")
-            bot.send_chat_action(message.chat.id, "upload_document")
-            bot.send_document(message.chat.id, abrir)
+            bot.send_chat_action(message.from_user.id, "upload_document")
+            bot.send_document(message.from_user.id, abrir)
         else:
             ruta = buscar_en_archivo("Mat", data)
             if ruta:
                 abrir = open(ruta, "rb")
-                bot.send_chat_action(message.chat.id, "upload_document")
-                bot.send_document(message.chat.id, abrir)
+                bot.send_chat_action(message.from_user.id, "upload_document")
+                bot.send_document(message.from_user.id, abrir)
 
 
 def enviar_doc(bot, doc, message):
@@ -185,20 +176,13 @@ def enviar_doc(bot, doc, message):
             download(bot, call.data, message)
 
         if len(lista) != 0:
-            if len(lista) == 1 and lista[0] == ".DS_Store":
-                bot.send_chat_action(message.chat.id, "typing")
-                bot.send_message(
-                    message.chat.id,
-                    f"No contamos con los {doc} para {dic[message.chat.id]['asignatura']}",
-                )
-            else:
-                documentos = crear_botones(lista)
-                bot.send_chat_action(message.chat.id, "typing")
-                bot.send_message(
-                    message.chat.id,
-                    f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
-                    reply_markup=documentos,
-                )
+            documentos = crear_botones(lista)
+            bot.send_chat_action(message.chat.id, "typing")
+            bot.send_message(
+                message.chat.id,
+                f"Estos son los {doc} de la asignatura {dic[message.chat.id]['asignatura']}",
+                reply_markup=documentos,
+            )
 
         else:
             bot.send_chat_action(message.chat.id, "typing")
