@@ -205,7 +205,7 @@ def procesar_libros():
         )
         generate_embeddings(new_chunks)
         index, updated_chunks = create_vector_store_sklearn(
-            existing_chunks, new_chunks=new_chunks
+            existing_chunks if existing_chunks != None else [], new_chunks=new_chunks
         )
         save_data(EMBEDDINGS_FILE, updated_chunks)
         save_data(INDEX_FILE, index)
