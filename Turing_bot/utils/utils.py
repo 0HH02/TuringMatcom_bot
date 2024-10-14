@@ -7,6 +7,7 @@ import os
 import json
 
 from logger import bot_logger
+from main import bot
 
 dic = {}
 
@@ -136,14 +137,15 @@ def buscar_en_archivo(ruta, data):
 
 
 def download(bot, data: str, message):
+    user_id = message.from_user.id
     rutas = ["Examenes", "Libros", "Mat"]
     for carpeta in rutas:
         ruta = buscar_en_archivo(carpeta, data)
         if ruta:
             try:
                 with open(ruta, "rb") as abrir:
-                    bot.send_chat_action(message.from_user.id, "upload_document")
-                    bot.send_document(message.from_user.id, abrir)
+                    bot.send_chat_action(user_id, "upload_document")
+                    bot.send_document(user_id, abrir)
                 return
             except Exception as e:
                 bot_logger.error(f"Error al enviar documento {ruta}: {e}")
@@ -182,10 +184,6 @@ def enviar_doc(bot, doc, message):
         )
         try:
             lista = os.listdir(ruta)
-
-            @bot.callback_query_handler(func=lambda call: True)
-            def handle_query(call):
-                download(bot, call.data, message)
 
             print(len(lista))
             if len(lista) != 0:
@@ -281,3 +279,10 @@ def Mate(bot, message):
         "Hola, acá encontrará lo relacionado con la asignatura Matemática",
         buttons,
     )
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def handle_query(call):
+    data = call.data
+    # Puedes usar call.message si necesitas información del mensaje original
+    download(bot, data, call.message)
