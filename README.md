@@ -2,6 +2,9 @@
 
 Este es un proyecto OpenSource para los estudiantes de la facultad de Matemática y Computación de la Universidad de La Habana con la idea de utilizar las últimas herramientas de IA para elevar la calidad de la educación.
 
+## Cómo correr el bot?:
+python Turing_bot/main.py
+
 ## Cómo añadir contenido?:
 
 - Añadir canales de Youtube para cada asignatura. Para eso dirigirse a la carpeta de Youtube dentro de la carpeta Exámenes y añadir el nombre del canal y el link en el json siguiendo el mismo formato que tiene.

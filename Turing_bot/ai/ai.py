@@ -13,6 +13,7 @@ model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 def generate_embeddings(chunks, model_name="models/embedding-001"):
     embeddings = []
     for chunk in chunks:
+        time.sleep(0.06)
         response = genai.embed_content(
             model=model_name,
             content=chunk["text"],
