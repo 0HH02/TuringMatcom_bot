@@ -195,6 +195,7 @@ def procesar_libros():
         return None, None
 
     data_logger.info(f"Se encontraron {total_files} archivos PDF.")
+    print(f"Total de libros encontrados: {total_files}")
     existing_chunks, index = load_existing_data()
     new_chunks = get_new_chunks(pdf_files, existing_chunks)
 
@@ -257,7 +258,6 @@ def get_new_chunks(
     )
     new_chunks = []
     total_files = len(pdf_files)
-    print(f"Total de libros encontrados: {total_files}")
     for idx, pdf_file_path in enumerate(pdf_files, start=1):
         file_name = os.path.basename(pdf_file_path)
         for processed_file in processed_files:
