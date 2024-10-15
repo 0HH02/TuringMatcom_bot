@@ -276,7 +276,7 @@ def Mate(bot, message):
         message,
         "Mat",
         "Hola, acá encontrará lo relacionado con la asignatura Matemática",
-        buttons,
+        buttons_mat,
     )
 
 
