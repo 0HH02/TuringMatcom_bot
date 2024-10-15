@@ -7,7 +7,6 @@ import os
 import json
 
 from logger import bot_logger
-from main import bot
 
 dic = {}
 
@@ -137,7 +136,7 @@ def buscar_en_archivo(ruta, data):
 
 
 def download(bot, data: str, message):
-    user_id = message.from_user.id
+    user_id = message.chat.id
     rutas = ["Examenes", "Libros", "Mat"]
     for carpeta in rutas:
         ruta = buscar_en_archivo(carpeta, data)
@@ -281,8 +280,13 @@ def Mate(bot, message):
     )
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def handle_query(call):
+def handle_query(call, bot):
     data = call.data
     # Puedes usar call.message si necesitas información del mensaje original
     download(bot, data, call.message)
+
+
+def register_handlers(bot):
+    @bot.callback_query_handler(func=lambda call: True)
+    def callback_handler(call):
+        handle_query(call, bot)

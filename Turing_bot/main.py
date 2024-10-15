@@ -17,6 +17,7 @@ from utils.utils import (
     buscar,
     load_data,
     save_data,
+    register_handlers,
 )
 from ai.ai import (
     generate_answer,
@@ -31,6 +32,8 @@ bot_logger.info("Iniciando el bot...")
 
 # Inicializar el bot de Telegram con el token proporcionado
 bot = telebot.TeleBot(TOKEN)
+
+register_handlers(bot)
 
 # Cargar datos de usuarios si el archivo existe
 if os.path.exists(USER_DATA_FILE):
@@ -226,7 +229,7 @@ def respuesta_amable(chat_id, mensaje, metodo_respuesta):
 
 
 # Procesar libros y generar índices al iniciar el bot
-save_index, save_chunks = procesar_libros()
+# save_index, save_chunks = procesar_libros()
 
 # Iniciar el bot y mantenerlo en ejecución
 bot.infinity_polling()
