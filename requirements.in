@@ -1,0 +1,7 @@
+telebot
+python-dotenv
+pyPDF2
+scikit-learn
+numpy
+google-generativeai
+PyCryptodome

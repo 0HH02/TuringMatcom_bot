@@ -5,7 +5,6 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import os
 import copy
-import math
 
 from logger import data_logger
 from utils.utils import load_data, save_data

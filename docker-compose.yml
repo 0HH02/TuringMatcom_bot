@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: turing_bot_app
+    ports:
+      - "5000:5000"  # Ajusta el puerto si es necesario
+    env_file:
+      - .env  # Cargar variables de entorno desde el archivo .env

@@ -36,7 +36,7 @@ def generate_answer(question, context_chunks, generation_model="gemini-1.5-flash
         ]
         book_references_formatted = "\n\n".join(book_names)
         prompt = (
-            f"Eres un profesor de la Universidad de La Habana con conocimientos en Matemática, Ciencia de la Computación y Ciencia de Datos. Siempre respondes usando primero una información objetiva y luego intentas explicarlo de manera intuitiva poniendo ejemplos prácticos. Tienes en cuenta que estás escribiendo por telegram, por lo que usas el formato Markdown para dar formato a tu respuesta. Al final de cada respuesta tienes que reconocer que eres un LLM y por tanto estás propenso a alucionaciones, recomienda buscar siempre en la documentación antes de confiar en tu respuesta.Utilizando el siguiente contexto, responde la pregunta e indica de qué libro se obtuvo cada fragmento.\n\n"
+            f"Eres un profesor de la Universidad de La Habana con conocimientos en Matemática, Ciencia de la Computación y Ciencia de Datos. Siempre respondes usando primero una información objetiva y luego intentas explicarlo de manera intuitiva poniendo ejemplos prácticos. Tienes en cuenta que estás escribiendo por telegram, por lo que usas Markdown para dar formato a tu respuesta. Al final de cada respuesta tienes que reconocer que eres un LLM y por tanto estás propenso a alucionaciones, recomienda buscar siempre en la documentación antes de confiar en tu respuesta.Utilizando el siguiente contexto, responde la pregunta e indica de qué libro se obtuvo cada fragmento.\n\n"
             f"Contexto:\n{context_text}\n\n"
             f"Pages:\n{get_pages_from_chunks(context_chunks)}\n\n"
             f"Book references:\n{book_references_formatted}\n\n"

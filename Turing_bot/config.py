@@ -1,9 +1,16 @@
 # config.py
 import os
-import streamlit as st
+from dotenv import load_dotenv
 
-GOOGLE_API_KEY = st.secrets["general"]["GOOGLE_API_KEY"]
-TOKEN = st.secrets["general"]["TOKEN"]
+load_dotenv()
+
+# import streamlit as st
+
+# GOOGLE_API_KEY = st.secrets["general"]["GOOGLE_API_KEY"]
+# TOKEN = st.secrets["general"]["TOKEN"]
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+TOKEN = os.getenv("TOKEN")
 
 if not GOOGLE_API_KEY or not TOKEN:
     raise ValueError(
