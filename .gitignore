@@ -3,7 +3,7 @@
 **/__pycache__/
 user_data.pkl
 vector_index.pkl
-embeddings_data.pkl
+# embeddings_data.pkl
 ai.log
 bot.log
 data.log

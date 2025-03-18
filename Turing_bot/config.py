@@ -11,6 +11,7 @@ load_dotenv()
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 TOKEN = os.getenv("TOKEN")
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 if not GOOGLE_API_KEY or not TOKEN:
     raise ValueError(

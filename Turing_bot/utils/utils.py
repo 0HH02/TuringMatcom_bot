@@ -158,6 +158,7 @@ def enviar_doc(bot, doc, message):
 
     if doc == "Youtube":
         ruta = os.path.join("Examenes", dic[message.chat.id]["asignatura"], doc)
+        print(ruta)
         lista = os.listdir(ruta)
         if len(lista) != 0:
             b = crear_botones_yt(os.path.join(ruta, "yt.json"))
@@ -181,6 +182,7 @@ def enviar_doc(bot, doc, message):
             if doc == "Libros"
             else os.path.join("Examenes", dic[message.chat.id]["asignatura"], doc)
         )
+        print(os.listdir(ruta))
         try:
             lista = os.listdir(ruta)
 

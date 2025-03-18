@@ -119,6 +119,7 @@ def text_handler(message):
     """
     Maneja todos los mensajes de texto. Dependiendo del contenido,
     responde con documentos, maneja comandos no disponibles o genera
+    
     respuestas académicas/amables.
     """
     if message.chat.type != "private":
